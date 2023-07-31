@@ -1,0 +1,11 @@
+@mixin under-width($width-px) {
+  @media (max-width: $width-px) {
+    @content;
+  }
+}
+
+@mixin on-mobile {
+  @include under-width(768px) {
+    @content;
+  }
+}

@@ -1,0 +1,118 @@
+@import "https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css";
+@import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
+#title {
+  margin-top: 12em;
+  margin-bottom: 12em;
+  margin-left: 8em;
+}
+@media (max-width: 1110px) {
+  #title {
+    margin-top: 12em;
+    margin-left: 6em;
+  }
+}
+@media (max-width: 960px) {
+  #title {
+    margin-top: 12em;
+    margin-left: 2em;
+  }
+}
+@media (max-width: 768px) {
+  #title {
+    margin-top: 0;
+    margin-left: 0;
+  }
+}
+#title #title-label {
+  letter-spacing: 10px;
+  margin-top: -20px;
+}
+#title #title-version {
+  border-radius: 50px;
+}
+@media (max-width: 768px) {
+  #title #title-version {
+    border-radius: 16px;
+  }
+}
+#title #title-version #button-download {
+  border-radius: 50px;
+  background-color: #AD977A;
+}
+@media (max-width: 768px) {
+  #title #title-version #button-download {
+    border-radius: 16px;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
+@media (max-width: 768px) {
+  #title #title-version #title-download-label {
+    padding-left: 0 !important;
+  }
+}
+#title .mockup-image {
+  max-height: 32em;
+  text-align: center;
+  float: right;
+  position: relative;
+  margin: 0;
+  top: -26em;
+  right: 0;
+}
+#title .mockup-image img {
+  position: relative;
+  height: 32em;
+  object-fit: contain;
+}
+@media (max-width: 768px) {
+  #title .mockup-image img {
+    height: auto;
+    width: 340px;
+    right: 0;
+  }
+}
+@media (max-width: 1460px) {
+  #title .mockup-image {
+    right: -10em;
+  }
+}
+@media (max-width: 1250px) {
+  #title .mockup-image {
+    right: -15em;
+  }
+}
+@media (max-width: 1000px) {
+  #title .mockup-image {
+    right: -20em;
+  }
+}
+@media (max-width: 768px) {
+  #title .mockup-image {
+    max-height: 16em;
+    position: static;
+    float: none;
+    margin: 8em auto 8em;
+    top: 0;
+    right: 0;
+  }
+}
+
+footer {
+  background-color: #070910 !important;
+  color: #e8e8e8;
+  text-align: center;
+  padding-top: 60px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: inline-block;
+}
+footer strong {
+  color: #e8e8e8;
+}
+
+/*# sourceMappingURL=title.css.map */
