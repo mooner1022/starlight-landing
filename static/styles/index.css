@@ -41,6 +41,7 @@
 #title #title-version #button-download {
   border-radius: 50px;
   background-color: #AD977A;
+  border-width: 0;
 }
 @media (max-width: 768px) {
   #title #title-version #button-download {
@@ -157,6 +158,9 @@ body {
   margin: 0;
   min-height: 100%;
   width: 100%;
+}
+body .modal-open {
+  overflow: hidden;
 }
 
 section {
