@@ -1,7 +1,7 @@
 <script>
     import Modal from "./Modal.svelte";
 
-    const DOWNLOAD_URL = "https://cdn.discordapp.com/attachments/1106997962879545364/1135781787520466994/app-release.apk";
+    const DOWNLOAD_URL = "https://cdn.discordapp.com/attachments/1106997962879545364/1138372352913186876/app-release.apk";
 
     function toggleModal() {
         showModal = !showModal;
