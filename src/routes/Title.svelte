@@ -1,13 +1,25 @@
 <script>
     import Modal from "./Modal.svelte";
+    import {onMount} from "svelte";
 
-    const DOWNLOAD_URL = "https://cdn.discordapp.com/attachments/1106997962879545364/1135781787520466994/app-release.apk";
+    const VERSION_CHECK_URL = "https://raw.githubusercontent.com/mooner1022/starlight-version/master/version.json"
+    const DIST_VERSION      = "snapshot";
+
+    let version;
 
     function toggleModal() {
+        if (!version)
+            return;
         showModal = !showModal;
         document.body.style.position = showModal ? "fixed" : "static";
         if (showModal)
-            downloadFile(DOWNLOAD_URL, "StarLight-v0_0_1.apk");
+            downloadFile(version[DIST_VERSION].downloadUrl, "StarLight-v0_0_1.apk");
+    }
+
+    async function fetchVersionInfo() {
+        return fetch(VERSION_CHECK_URL)
+            .then(response => response.json())
+            .catch((err) => console.error(err));
     }
 
     function downloadFile(url, name) {
@@ -19,7 +31,16 @@
         aTag.remove();
     }
 
+    function getDownloadUrl() {
+        return version[DIST_VERSION].downloadUrl;
+    }
+
     let showModal = false;
+    onMount(async function () {
+        version = await fetchVersionInfo();
+        console.log("version: " + version[DIST_VERSION].version);
+        console.log("downloadUrl: " + getDownloadUrl());
+    });
 </script>
 <section id="title">
     <div class="has-text-white">
@@ -38,7 +59,7 @@
         <div class="level">
             <div class="level-left ml-4 pl-3 is-block" id="title-download-label">
                 <div class="has-text-grey">Latest version</div>
-                <div class="is-size-4 has-text-weight-bold">v0.0.1-alpha</div>
+                <div class="is-size-4 has-text-weight-bold" id="version-number">{version ? 'v'+version[DIST_VERSION].version : "Checking..."}</div>
             </div>
             <div class="level-right icon-text has-text-weight-bold has-text-white p-4 pr-5 mr-1" id="button-download" tabindex="0" role="button" on:click={toggleModal} on:keypress={toggleModal}>
                 <span class="icon">
@@ -61,7 +82,7 @@
                 다운로드가 시작되었어요!
             </div>
             <div class="mb-5" style="font-size: 1.1em">
-                다운로드가 자동으로 시작되지 않았다면, <a href="{DOWNLOAD_URL}"><u>여기</u></a>를 클릭해주세요.
+                다운로드가 자동으로 시작되지 않았다면, <a href="{getDownloadUrl()}"><u>여기</u></a>를 클릭해주세요.
             </div>
         </div>
     </Modal>
