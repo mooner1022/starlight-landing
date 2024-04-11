@@ -117,6 +117,7 @@ body {
 
     #button-download {
       border-radius: 50px;
+      cursor: pointer;
       background-color: #AD977A;
       border-width: 0;
       transition: background-color 0.2s;
@@ -205,8 +206,13 @@ body {
 #main {
   transition: background-color 0.3s;
   background: linear-gradient(#FFFFFF00 0%, var(--bg-color) 12%, var(--bg-color) 100%);
-  padding-top: 10rem;
   margin: 0!important;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
 
   @include on-mobile {
     padding: 0 1rem;

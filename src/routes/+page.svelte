@@ -16,11 +16,28 @@
     let showModal = false;
     onMount(async function () {
         AOS.init();
+
         //return;
         versions = await fetchVersionInfo();
         console.log("version: " + versions[DIST_VERSION].version);
         console.log("downloadUrl: " + getDownloadUrl());
     });
+
+    /*
+    function handleScrollEvent() {
+        const container = document.getElementById("main");
+        if (!container)
+            return;
+
+        let isShown = container.classList.contains("fixed-center");
+        console.log("isShown: " + isShown);
+
+        if (isShown)
+            container.classList.remove("fixed-center");
+        else
+            container.classList.add("fixed-center");
+    }
+     */
 
     function toggleModal() {
         if (!versions)
@@ -74,7 +91,7 @@
             <h3 class="has-text-weight-light">The next-generation messenger auto-reply<br>application with <strong class="has-text-white">Plug-in</strong> support</h3>
         </div>
         <div class="pt-6 pb-6 mt-6 mb-6 desktop-only"></div>
-        <div class="mockup-image mobile-only">
+        <div class="mockup-image mobile-only fade-out" data-aos data-aos-anchor="#main">
             <img src="assets/mockup_noshadow.png" alt="mockup">
         </div>
         <div class="column is-full-mobile mt-6 p-3 fade-out" id="title-version" data-aos data-aos-anchor="#main">
@@ -84,15 +101,15 @@
                     <div class="is-size-4 has-text-weight-bold text black" id="version-number">{versions ? 'v'+versions[DIST_VERSION].version : "Checking..."}</div>
                 </div>
                 <div class="level-right icon-text has-text-weight-bold text white p-4 pr-5 mr-1" id="button-download" tabindex="0" role="button" on:click={toggleModal} on:keypress={toggleModal}>
-                <span class="icon">
-                    <i class="fa-solid fa-download"/>
-                </span>
+                    <span class="icon">
+                        <i class="fa-solid fa-download"/>
+                    </span>
                     <span>Download</span>
                 </div>
             </div>
         </div>
     </div>
-    <div id="title-right" class="desktop-only">
+    <div id="title-right" class="desktop-only fade-out" data-aos data-aos-anchor="#main">
         <div class="mockup-image">
             <img src="assets/mockup.png" alt="mockup">
         </div>
