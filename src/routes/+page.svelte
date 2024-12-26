@@ -7,7 +7,7 @@
     import "./styles.scss";
 
     const VERSION_CHECK_URL = "https://raw.githubusercontent.com/mooner1022/starlight-version/master/version.json"
-    const DIST_VERSION      = "snapshot";
+    const DIST_VERSION      = "beta";
     let   IS_DARK_MODE      = false;
 
     /** @type Versions */
