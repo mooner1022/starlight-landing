@@ -1,0 +1,66 @@
+<script lang="ts" module>
+	// Stroke icons drawn on a 24×24 grid. `github` is the only filled glyph.
+	const paths = {
+		download: ['M12 3v12', 'm7 10 5 5 5-5', 'M5 21h14'],
+		layers: ['m12 2 10 5-10 5L2 7z', 'm2 17 10 5 10-5', 'm2 12 10 5 10-5'],
+		code: ['m16 18 6-6-6-6', 'm8 6-6 6 6 6'],
+		zap: ['M13 2 3 14h9l-1 8 10-12h-9l1-8z'],
+		plug: ['M12 22v-5', 'M9 8V2', 'M15 8V2', 'M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z'],
+		history: ['M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8', 'M3 3v5h5', 'M12 7v5l4 2'],
+		activity: ['M22 12h-4l-3 9L9 3l-3 9H2'],
+		arrowRight: ['M5 12h14', 'm12 5 7 7-7 7'],
+		external: ['M15 3h6v6', 'M10 14 21 3', 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'],
+		shield: ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'],
+		check: ['M20 6 9 17l-5-5'],
+		sun: [
+			'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
+			'M12 2v2',
+			'M12 20v2',
+			'm4.93 4.93 1.41 1.41',
+			'm17.66 17.66 1.41 1.41',
+			'M2 12h2',
+			'M20 12h2',
+			'm6.34 17.66-1.41 1.41',
+			'm19.07 4.93-1.41 1.41'
+		],
+		moon: ['M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z'],
+		globe: [
+			'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z',
+			'M2 12h20',
+			'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'
+		],
+		smartphone: ['M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z', 'M12 18h.01'],
+		github: [
+			'M12 1.5C6.2 1.5 1.5 6.2 1.5 12c0 4.64 3 8.57 7.18 9.96.53.1.72-.23.72-.5v-1.96c-2.92.63-3.54-1.24-3.54-1.24-.48-1.21-1.17-1.54-1.17-1.54-.95-.65.07-.64.07-.64 1.06.07 1.61 1.08 1.61 1.08.94 1.6 2.46 1.14 3.06.87.1-.68.37-1.14.66-1.4-2.33-.27-4.78-1.17-4.78-5.18 0-1.15.41-2.08 1.08-2.82-.11-.27-.47-1.33.1-2.78 0 0 .88-.28 2.89 1.07a10.03 10.03 0 0 1 5.26 0c2-1.35 2.88-1.07 2.88-1.07.58 1.45.22 2.51.11 2.78.67.74 1.08 1.67 1.08 2.82 0 4.02-2.46 4.9-4.8 5.16.38.33.71.97.71 1.96v2.9c0 .28.19.61.73.5A10.5 10.5 0 0 0 22.5 12C22.5 6.2 17.8 1.5 12 1.5z'
+		]
+	} satisfies Record<string, string[]>;
+
+	export type IconName = keyof typeof paths;
+</script>
+
+<script lang="ts">
+	let { name, size = 20 }: { name: IconName; size?: number } = $props();
+	const filled = $derived(name === 'github');
+</script>
+
+<svg
+	width={size}
+	height={size}
+	viewBox="0 0 24 24"
+	fill={filled ? 'currentColor' : 'none'}
+	stroke={filled ? 'none' : 'currentColor'}
+	stroke-width="2"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+>
+	{#each paths[name] as d (d)}
+		<path {d} />
+	{/each}
+</svg>
+
+<style>
+	svg {
+		flex-shrink: 0;
+	}
+</style>
