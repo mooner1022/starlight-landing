@@ -1,8 +1,10 @@
 <script lang="ts">
 	import Icon from '#lib/components/Icon.svelte';
-	import { getMessages } from '#lib/i18n.ts';
+	import { getLocale, getMessages } from '#lib/i18n.ts';
+	import { docsHref } from '#lib/paths.ts';
 	import { reveal } from '#lib/reveal.ts';
 
+	const locale = $derived(getLocale());
 	const t = $derived(getMessages());
 </script>
 
@@ -15,14 +17,14 @@
 				<pre><code
 						><span class="tok-fn">plugins</span> <span class="tok-punc">{"{"}</span>
     <span class="tok-fn">id</span><span class="tok-punc">(</span><span class="tok-str">"com.android.application"</span><span class="tok-punc">)</span>
-    <span class="tok-fn">id</span><span class="tok-punc">(</span><span class="tok-str">"io.github.mooner1022.slplugin"</span><span class="tok-punc">)</span> <span class="tok-kw">version</span> <span class="tok-str">"0.2.0"</span>
+    <span class="tok-fn">id</span><span class="tok-punc">(</span><span class="tok-str">"io.github.mooner1022.slplugin"</span><span class="tok-punc">)</span> <span class="tok-kw">version</span> <span class="tok-str">"0.3.0"</span>
 <span class="tok-punc">{"}"}</span>
 
 <span class="tok-fn">starlight</span> <span class="tok-punc">{"{"}</span>
     <span class="tok-fn">manifest</span> <span class="tok-punc">{"{"}</span>
         id <span class="tok-punc">=</span> <span class="tok-str">"my_plugin"</span>
         mainClass <span class="tok-punc">=</span> <span class="tok-str">"com.example.MyPlugin"</span>
-        apiVersion <span class="tok-punc">=</span> <span class="tok-str">"0.3.0"</span>
+        apiVersion <span class="tok-punc">=</span> <span class="tok-str">"0.3.2"</span>
     <span class="tok-punc">{"}"}</span>
 <span class="tok-punc">{"}"}</span></code
 					></pre>
@@ -44,10 +46,16 @@
 					<li><Icon name="check" size={18} /><span>{point}</span></li>
 				{/each}
 			</ul>
-			<a class="link" href="https://github.com/mooner1022/StarLight-GradlePlugin" rel="noopener">
-				{t.plugins.link}
-				<Icon name="arrowRight" size={18} />
-			</a>
+			<div class="links">
+				<a class="button primary" href={docsHref(locale)}>
+					<Icon name="book" size={18} />
+					{t.plugins.docs}
+				</a>
+				<a class="link" href="https://github.com/mooner1022/StarLight-GradlePlugin" rel="noopener">
+					{t.plugins.link}
+					<Icon name="arrowRight" size={18} />
+				</a>
+			</div>
 		</div>
 	</div>
 </section>
@@ -103,11 +111,18 @@
 		color: var(--accent);
 	}
 
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px 24px;
+		margin-top: 28px;
+	}
+
 	.link {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		margin-top: 28px;
 		color: var(--accent);
 		font-weight: 600;
 	}
