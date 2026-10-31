@@ -14,6 +14,8 @@
 	--radius: 16px;
 	--radius-lg: 24px;
 	--content: 1160px;
+	/* The docs have a sidebar and a table of contents beside the text, so they get more room. */
+	--content-wide: 1440px;
 	--gutter: clamp(16px, 4vw, 32px);
 	--ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
@@ -148,6 +150,10 @@ ul {
 	max-width: var(--content);
 	margin-inline: auto;
 	padding-inline: var(--gutter);
+}
+
+.container.wide {
+	max-width: var(--content-wide);
 }
 
 .visually-hidden {

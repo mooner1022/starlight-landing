@@ -18,6 +18,7 @@ const ko = {
 		code: '코드',
 		plugins: '플러그인',
 		download: '다운로드',
+		docs: '문서',
 		switchLang: 'EN',
 		switchLangLabel: 'View in English',
 		toLight: '라이트 모드로 전환',
@@ -109,6 +110,7 @@ const ko = {
 			'런타임에야 드러나던 문제를 빌드 오류로 미리 확인',
 			'adb로 배포하고 앱 재시작, 로그캣까지 한 번에'
 		],
+		docs: '개발 문서 보기',
 		link: 'Gradle 플러그인 보기',
 		deployComment: '기기에 배포하고 StarLight 재시작'
 	},
@@ -167,6 +169,37 @@ const ko = {
 		title: '앱의 개인정보 사용에 관한 내용',
 		body: '이 애플리케이션은 업데이트 확인을 위한 서버 접속 이외에 인터넷을 직접적으로 사용하지 않으며, 사용자의 데이터를 수집하지 않습니다.',
 		back: '홈으로'
+	},
+	docs: {
+		title: '플러그인 개발 문서',
+		metaSuffix: 'StarLight 플러그인 문서',
+		navLabel: '문서 목차',
+		search: '문서 검색',
+		noResults: '일치하는 문서가 없어요.',
+		onThisPage: '이 페이지에서',
+		prev: '이전',
+		next: '다음',
+		edit: 'GitHub에서 이 문서 수정하기',
+		fallback: '',
+		copy: '복사',
+		copied: '복사됨',
+		sections: {
+			start: '시작하기',
+			guides: '가이드',
+			reference: 'API 레퍼런스',
+			sdk: 'SDK'
+		},
+		sdk: {
+			title: '최신 SDK',
+			channel: 'nightly',
+			channelNote: 'StarLight nightly 빌드 기준이에요. 정식 앱(0.3.4b)에는 PluginCore 0.3.2가 들어 있어요.',
+			preparing: '준비 중',
+			download: '내려받기',
+			plugincore: '플러그인 기본 클래스, 이벤트, 프로젝트, 위젯 API',
+			configdsl: '플러그인 설정 화면을 만드는 DSL',
+			bundled: 'PluginCore와 함께 배포',
+			notice: 'SDK 파일 배포는 아직 준비 중이에요. 지금은 StarLight 저장소에서 직접 빌드해 주세요.'
+		}
 	}
 };
 
@@ -186,6 +219,7 @@ const en: Messages = {
 		code: 'Code',
 		plugins: 'Plugins',
 		download: 'Download',
+		docs: 'Docs',
 		switchLang: '한국어',
 		switchLangLabel: '한국어로 보기',
 		toLight: 'Switch to light mode',
@@ -277,6 +311,7 @@ const en: Messages = {
 			'Turns problems that would only show up at runtime into build errors',
 			'Deploys with adb, restarts the app and streams logcat'
 		],
+		docs: 'Read the developer docs',
 		link: 'View the Gradle plugin',
 		deployComment: 'Deploy to the device and restart StarLight'
 	},
@@ -338,6 +373,37 @@ const en: Messages = {
 		title: 'How the app handles personal information',
 		body: 'This application does not use or collect personal information from users, and does not connect to the network directly except when checking for updates.',
 		back: 'Back to home'
+	},
+	docs: {
+		title: 'Plugin developer docs',
+		metaSuffix: 'StarLight plugin docs',
+		navLabel: 'Docs navigation',
+		search: 'Search docs',
+		noResults: 'No pages match.',
+		onThisPage: 'On this page',
+		prev: 'Previous',
+		next: 'Next',
+		edit: 'Edit this page on GitHub',
+		fallback: 'This page is only available in Korean for now.',
+		copy: 'Copy',
+		copied: 'Copied',
+		sections: {
+			start: 'Getting started',
+			guides: 'Guides',
+			reference: 'API reference',
+			sdk: 'SDK'
+		},
+		sdk: {
+			title: 'Latest SDK',
+			channel: 'nightly',
+			channelNote: 'Based on StarLight nightly builds. The released app (0.3.4b) ships PluginCore 0.3.2.',
+			preparing: 'Coming soon',
+			download: 'Download',
+			plugincore: 'Plugin base class, events, projects and widget APIs',
+			configdsl: 'DSL for plugin settings screens',
+			bundled: 'Released with PluginCore',
+			notice: 'SDK downloads are not hosted yet. For now, build them from the StarLight repository.'
+		}
 	}
 };
 

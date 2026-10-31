@@ -5,13 +5,14 @@
 	import Logo from '#lib/components/Logo.svelte';
 	import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 	import { getLocale, getMessages } from '#lib/i18n.ts';
-	import { localizedHref, type PageKey } from '#lib/paths.ts';
+	import { alternateHref, docsHref, localizedHref } from '#lib/paths.ts';
 
 	const locale = $derived(getLocale());
 	const t = $derived(getMessages());
 	const home = $derived(localizedHref(locale));
-	const current: PageKey = $derived(page.route.id?.endsWith('/app-privacy') ? 'privacy' : 'home');
-	const otherLocaleHref = $derived(localizedHref(locale === 'ko' ? 'en' : 'ko', current));
+	const docs = $derived(docsHref(locale));
+	const inDocs = $derived(page.route.id?.includes('/docs/') ?? false);
+	const otherLocaleHref = $derived(alternateHref(locale === 'ko' ? 'en' : 'ko'));
 
 	const links = $derived([
 		{ id: 'features', label: t.nav.features },
@@ -31,7 +32,7 @@
 <a class="skip-link" href="#content">{t.nav.skip}</a>
 
 <header class="site-header" class:on-night={!scrolled} class:scrolled>
-	<div class="container bar">
+	<div class="container bar" class:wide={inDocs}>
 		<a class="brand" href="{home}#home" aria-label={t.nav.home}>
 			<span class="brand-mark"><Logo size={22} /></span>
 			<span class="brand-name">StarLight</span>
@@ -42,10 +43,20 @@
 				{#each links as link (link.id)}
 					<li><a href="{home}#{link.id}">{link.label}</a></li>
 				{/each}
+				<li class="docs-link">
+					<a href={docs} class:active={inDocs} aria-current={inDocs ? 'page' : undefined}>
+						<Icon name="book" size={16} />
+						{t.nav.docs}
+					</a>
+				</li>
 			</ul>
 		</nav>
 
 		<div class="actions">
+			<!-- The nav is hidden on small screens, so the docs keep a way in from the header. -->
+			<a class="icon-button docs-button" href={docs} aria-label={t.nav.docs} title={t.nav.docs}>
+				<Icon name="book" size={18} />
+			</a>
 			<a
 				class="lang"
 				href={otherLocaleHref}
@@ -163,6 +174,27 @@
 		background: rgb(127 127 127 / 0.12);
 	}
 
+	.docs-link {
+		margin-left: 6px;
+		padding-left: 10px;
+		border-left: 1px solid var(--border);
+	}
+
+	.docs-link a {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.docs-link a.active {
+		color: var(--accent);
+		background: var(--accent-soft);
+	}
+
+	.docs-button {
+		display: none;
+	}
+
 	.actions {
 		display: flex;
 		align-items: center;
@@ -199,6 +231,10 @@
 
 		.actions {
 			margin-left: auto;
+		}
+
+		.docs-button {
+			display: inline-grid;
 		}
 	}
 

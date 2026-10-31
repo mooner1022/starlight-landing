@@ -1,14 +1,17 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import Logo from '#lib/components/Logo.svelte';
 	import { getLocale, getMessages } from '#lib/i18n.ts';
-	import { localizedHref } from '#lib/paths.ts';
+	import { docsHref, localizedHref } from '#lib/paths.ts';
 
 	const locale = $derived(getLocale());
 	const t = $derived(getMessages());
+	// Lines up with the docs' wider layout.
+	const inDocs = $derived(page.route.id?.includes('/docs/') ?? false);
 </script>
 
 <footer class="site-footer">
-	<div class="container inner">
+	<div class="container inner" class:wide={inDocs}>
 		<div class="brand">
 			<span class="mark"><Logo size={18} /></span>
 			<strong>StarLight</strong>
@@ -17,6 +20,7 @@
 
 		<nav class="links" aria-label="Footer">
 			<a href="https://github.com/mooner1022/StarLight" rel="noopener">GitHub</a>
+			<a href={docsHref(locale)}>{t.nav.docs}</a>
 			<a href="https://github.com/mooner1022/starlight-landing" rel="noopener">{t.footer.websiteSource}</a>
 			<a href={localizedHref(locale, 'privacy')}>{t.footer.privacy}</a>
 		</nav>
