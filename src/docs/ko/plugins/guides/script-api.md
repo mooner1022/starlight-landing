@@ -109,4 +109,4 @@ Kotlin `object`의 함수를 스크립트에서 정적 메서드로 부르려면
 
 ## 다음 단계
 
-스크립트가 API를 부르는 대신, 플러그인이 스크립트의 함수를 부르게 하려면 [프로젝트 이벤트](/docs/guides/project-events)를 만드세요.
+스크립트가 API를 부르는 대신, 플러그인이 스크립트의 함수를 부르게 하려면 [프로젝트 이벤트](/docs/plugins/guides/project-events)를 만드세요.

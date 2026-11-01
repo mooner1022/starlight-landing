@@ -47,7 +47,7 @@
 				{/each}
 			</ul>
 			<div class="links">
-				<a class="button primary" href={docsHref(locale)}>
+				<a class="button primary" href={docsHref(locale, 'plugins')}>
 					<Icon name="book" size={18} />
 					{t.plugins.docs}
 				</a>

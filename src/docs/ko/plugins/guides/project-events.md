@@ -130,5 +130,5 @@ if (project.isCompiled && project.isEventCallAllowed(eventId)) {
 
 ## 다음 단계
 
-- 이벤트 호출 시점을 앱 이벤트(프로젝트 컴파일, 메시지 수신 등)에 맞추려면 → [이벤트 레퍼런스](/docs/reference/events)
-- 실제 예제 → [웹 서버 플러그인 살펴보기](/docs/guides/webserver-example)
+- 이벤트 호출 시점을 앱 이벤트(프로젝트 컴파일, 메시지 수신 등)에 맞추려면 → [이벤트 레퍼런스](/docs/plugins/reference/events)
+- 실제 예제 → [웹 서버 플러그인 살펴보기](/docs/plugins/guides/webserver-example)

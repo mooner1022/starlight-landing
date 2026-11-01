@@ -7,7 +7,7 @@ order: 2
 StarLight는 앱 안에서 일어나는 일을 코루틴 `SharedFlow`로 흘려보내요. 플러그인은 `EventHandler`로 원하는 이벤트를 구독할 수 있어요.
 
 > [!NOTE]
-> 이 페이지의 이벤트는 **앱 이벤트**예요. 스크립트 함수를 부르는 [프로젝트 이벤트](/docs/guides/project-events)와는 다른 개념이에요.
+> 이 페이지의 이벤트는 **앱 이벤트**예요. 스크립트 함수를 부르는 [프로젝트 이벤트](/docs/plugins/guides/project-events)와는 다른 개념이에요.
 
 ## 구독
 

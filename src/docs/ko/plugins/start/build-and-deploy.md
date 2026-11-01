@@ -86,7 +86,7 @@ starlight {
 | `requires PluginCore X or newer` | `api_version`이 앱의 PluginCore보다 높아요. 앱을 업데이트하거나 `api_version`을 낮추세요. |
 | `targets PluginCore X, older than the supported Y` | `api_version`이 지원 범위보다 오래됐어요. |
 | `Required dependency X for plugin Y wasn't found` | `dependency`에 적은 플러그인이 기기에 없거나 버전(major.minor)이 맞지 않아요. |
-| `Failed to read plugin info from …` | `starlight.json`을 읽지 못했어요. 뒤에 붙은 이유를 확인하세요. `Cannot find starlight.json`은 파일 위치, `Malformed starlight.json`은 JSON 문법이나 BOM, `Illegal plugin id`는 ID에 쓸 수 없는 문자가 있다는 뜻이에요. → [형식 규칙](/docs/start/manifest#파일-형식-규칙) |
+| `Failed to read plugin info from …` | `starlight.json`을 읽지 못했어요. 뒤에 붙은 이유를 확인하세요. `Cannot find starlight.json`은 파일 위치, `Malformed starlight.json`은 JSON 문법이나 BOM, `Illegal plugin id`는 ID에 쓸 수 없는 문자가 있다는 뜻이에요. → [형식 규칙](/docs/plugins/start/manifest#파일-형식-규칙) |
 | `was skipped because … has the same id` | 같은 ID의 `.slp`가 여러 개예요. 버전이 가장 높은 파일만 불러오니, 예전 파일을 지우세요. |
 | `Failed to load plugin …` | 플러그인 클래스를 만들지 못했어요. `main_class` 이름과 생성자를 확인하세요. |
 

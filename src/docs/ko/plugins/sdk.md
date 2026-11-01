@@ -30,7 +30,7 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 
 **새 기능**
 
-- [홈 위젯 DSL](/docs/guides/widgets): `widget(id) { }`, 크기(span) 모델과 격자 배치, 위젯별 설정, 레이아웃 저장과 예전 위젯 이전
+- [홈 위젯 DSL](/docs/plugins/guides/widgets): `widget(id) { }`, 크기(span) 모델과 격자 배치, 위젯별 설정, 레이아웃 저장과 예전 위젯 이전
 - 매니페스트 `category` 키와 `PluginCategory`
 - 플러그인 설치 기록: 설치 출처와 불러오기 상태를 추적해요.
 - 프로젝트 이벤트를 공유 워커에서 프로젝트별 버퍼로 실행하고, 대기 중인 이벤트 수(`Project.queuedEvents()`)를 보여 줘요.

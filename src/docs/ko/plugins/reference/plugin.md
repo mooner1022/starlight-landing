@@ -22,7 +22,7 @@ abstract class StarlightPlugin : Plugin, EventListener
 | `onDisable()` | 플러그인이 꺼질 때예요. `onEnable()`에서 시작한 스레드, 코루틴, 리소스를 정리해요. |
 | `onNetworkStateChanged(state: Int)` | 기기의 네트워크 상태가 바뀔 때예요. `NetworkUtil.NETWORK_STATUS_NOT_CONNECTED`(0), `_WIFI`(1), `_MOBILE`(2), `_ETHERNET`(3) 중 하나가 들어와요. |
 | `onSchemeAction(context, isGlobal, params)` | `starlight://action/<플러그인 ID>?키=값` 링크가 열릴 때예요. 플러그인 ID 자리에 `global`을 쓰면 모든 플러그인이 받고, 이때 `isGlobal`이 `true`예요. |
-| `onProjectCreated(project)` / `onProjectRemoved(project)` / `onProjectUpdated(project)` | 인터페이스에는 있지만 **현재 앱은 플러그인에 이 콜백을 호출하지 않아요.** 대신 [`EventHandler.on<Events.Project.*>`](/docs/reference/events#프로젝트)를 쓰세요. |
+| `onProjectCreated(project)` / `onProjectRemoved(project)` / `onProjectUpdated(project)` | 인터페이스에는 있지만 **현재 앱은 플러그인에 이 콜백을 호출하지 않아요.** 대신 [`EventHandler.on<Events.Project.*>`](/docs/plugins/reference/events#프로젝트)를 쓰세요. |
 
 ### 추가 리스너
 
@@ -42,7 +42,7 @@ protected fun addListener(listener: EventListener)
 | `getPluginConfig(): ConfigData` | 저장된 설정 값을 읽어요. 결과는 캐시돼요. |
 | `invalidateConfigCache()` | 설정 캐시를 비워요. `super.onConfigUpdated()`가 대신 호출해 줘요. |
 
-자세한 사용법은 [설정 화면 만들기](/docs/guides/settings)를 참고하세요.
+자세한 사용법은 [설정 화면 만들기](/docs/plugins/guides/settings)를 참고하세요.
 
 ## 등록
 
@@ -50,10 +50,10 @@ protected fun addListener(listener: EventListener)
 
 | 메서드 | 설명 |
 |---|---|
-| `addApi(api: Api<T>)` | 스크립트 전역 API를 등록해요. → [스크립트에 API 노출하기](/docs/guides/script-api) |
-| `registerProjectEvents { … }` | 프로젝트 이벤트를 등록해요. → [프로젝트 이벤트](/docs/guides/project-events) |
+| `addApi(api: Api<T>)` | 스크립트 전역 API를 등록해요. → [스크립트에 API 노출하기](/docs/plugins/guides/script-api) |
+| `registerProjectEvents { … }` | 프로젝트 이벤트를 등록해요. → [프로젝트 이벤트](/docs/plugins/guides/project-events) |
 | `fireProjectEvent<T>(vararg args, onFailure)` | 이벤트를 받을 수 있는 모든 프로젝트의 함수를 호출해요. |
-| `addWidget(definition: WidgetDefinition)` | DSL로 만든 홈 위젯을 등록해요. **PluginCore 1.0.0 이상** → [홈 위젯](/docs/guides/widgets) |
+| `addWidget(definition: WidgetDefinition)` | DSL로 만든 홈 위젯을 등록해요. **PluginCore 1.0.0 이상** → [홈 위젯](/docs/plugins/guides/widgets) |
 | `addWidget(widget: Class<out Widget>)` / `addWidget<T>()` | 예전 방식(`Widget` 상속)의 위젯을 등록해요. |
 | `addLanguage(language: Language)` | 새 스크립트 언어를 등록해요. 아래 [언어 추가](#언어-추가)를 참고하세요. |
 
@@ -75,7 +75,7 @@ protected fun addListener(listener: EventListener)
 
 ## PluginInfo
 
-`starlight.json`을 읽은 결과예요. 키 설명은 [starlight.json](/docs/start/manifest#키)에 있어요.
+`starlight.json`을 읽은 결과예요. 키 설명은 [starlight.json](/docs/plugins/start/manifest#키)에 있어요.
 
 | 속성 | 형식 |
 |---|---|
@@ -96,7 +96,7 @@ protected fun addListener(listener: EventListener)
 |---|---|
 | `id`, `name`, `fileExtension` | 언어 ID, 표시 이름, 스크립트 파일 확장자예요. |
 | `requireRelease` | `true`면 이벤트 함수를 호출할 때마다, 그리고 스코프를 정리하기 전에 `release(scope)`를 불러요. 스레드에 묶인 실행 컨텍스트를 정리해야 하는 엔진에 써요. |
-| `compile(code, apis, project, classLoader): Any` | 스크립트를 컴파일하고 스코프를 돌려줘요. `apis`(등록된 [API](/docs/guides/script-api) 목록)를 스크립트에 넣어 주는 것도 언어의 몫이에요. |
+| `compile(code, apis, project, classLoader): Any` | 스크립트를 컴파일하고 스코프를 돌려줘요. `apis`(등록된 [API](/docs/plugins/guides/script-api) 목록)를 스크립트에 넣어 주는 것도 언어의 몫이에요. |
 | `callFunction(scope, functionName, args): Any?` | 컴파일된 스코프에서 이벤트 함수를 불러요. |
 | `eval(code, options): Any` | 코드 한 조각을 실행해요(디버그룸 등). |
 | `release(scope)`, `destroy(scope)` | 스코프를 풀고 정리해요. |

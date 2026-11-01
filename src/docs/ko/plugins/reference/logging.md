@@ -47,7 +47,7 @@ LOG.error(e) { "서버를 멈추지 못했어요" }
 LOG.info(LogData.FLAG_NOTIFY) { "서버 재시작 중..." }
 ```
 
-로그가 남을 때마다 `Events.Log.Create`(`log: LogData`) [이벤트](/docs/reference/events)가 발생해요. 프로젝트별 로그는 [`project.logger`](/docs/reference/projects#프로젝트-로그)를 쓰세요.
+로그가 남을 때마다 `Events.Log.Create`(`log: LogData`) [이벤트](/docs/plugins/reference/events)가 발생해요. 프로젝트별 로그는 [`project.logger`](/docs/plugins/reference/projects#프로젝트-로그)를 쓰세요.
 
 ## 번역
 
@@ -101,4 +101,4 @@ LOG.infoTranslated {
 | `TranslationManager.getLocale(): Locale` | 현재 앱 언어예요. |
 | `TranslationManager.translateTo(locale) { }` | 앱 언어와 상관없이 지정한 언어로 번역해요. |
 
-앱 언어가 바뀌면 `Events.Locale.Update` [이벤트](/docs/reference/events#그-밖의-이벤트)가 발생해요.
+앱 언어가 바뀌면 `Events.Locale.Update` [이벤트](/docs/plugins/reference/events#그-밖의-이벤트)가 발생해요.

@@ -22,7 +22,7 @@ order: 1
 플러그인은 **PluginCore**와 **ConfigDSL**을 `compileOnly`로 참조해요. 실행할 때는 StarLight 앱이 들어 있는 것을 쓰기 때문에, 플러그인 파일에 함께 넣으면 안 돼요.
 
 > [!NOTE]
-> SDK 파일 배포는 아직 준비 중이에요. 지금은 StarLight 저장소에서 직접 빌드해 주세요. 배포가 시작되면 [SDK 페이지](/docs/sdk)에서 내려받을 수 있어요.
+> SDK 파일 배포는 아직 준비 중이에요. 지금은 StarLight 저장소에서 직접 빌드해 주세요. 배포가 시작되면 [SDK 페이지](/docs/plugins/sdk)에서 내려받을 수 있어요.
 
 ```bash
 git clone https://github.com/mooner1022/StarLight.git
@@ -89,10 +89,10 @@ dependencies {
 }
 ```
 
-위 버전은 [웹 서버 플러그인](/docs/guides/webserver-example)이 쓰는 값이에요. 앱의 라이브러리 버전과 맞춰 주세요.
+위 버전은 [웹 서버 플러그인](/docs/plugins/guides/webserver-example)이 쓰는 값이에요. 앱의 라이브러리 버전과 맞춰 주세요.
 
 다른 플러그인이 제공하는 라이브러리도 같은 방식으로 `compileOnly`로 참조하고, `starlight.json`의 `dependency`에 그 플러그인을 적어요. 예를 들어 웹 서버 플러그인은 Ktor를 직접 넣지 않고 Ktor 플러그인(`ktor@3.6.0`)에서 불러와요.
 
 ## 다음 단계
 
-준비가 끝났다면 [첫 플러그인 만들기](/docs/start/first-plugin)로 넘어가세요.
+준비가 끝났다면 [첫 플러그인 만들기](/docs/plugins/start/first-plugin)로 넘어가세요.

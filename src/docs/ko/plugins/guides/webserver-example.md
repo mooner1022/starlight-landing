@@ -108,11 +108,11 @@ override fun onEnable() {
 }
 ```
 
-1. **설정 읽기** — 포트, 접속 범위, 토큰 같은 값을 [설정](/docs/guides/settings)에서 읽어요.
-2. **프로젝트 이벤트** — `webserver.server.setup` 이벤트를 등록해요. → [프로젝트 이벤트](/docs/guides/project-events)
-3. **스크립트 API** — 전역 `WebServer`를 노출해요. → [스크립트에 API 노출하기](/docs/guides/script-api)
-4. **홈 위젯** — 위젯을 지원하지 않는 앱에서도 플러그인이 켜지도록 `LinkageError`를 잡아요. → [홈 위젯](/docs/guides/widgets)
-5. **앱 이벤트 구독** — 프로젝트가 컴파일되면 라우터를 새로 만들고 설정 함수를 불러요. 구독은 플러그인 전용 코루틴 스코프에서 해서, `onDisable()`에서 한 번에 취소해요. → [이벤트](/docs/reference/events)
+1. **설정 읽기** — 포트, 접속 범위, 토큰 같은 값을 [설정](/docs/plugins/guides/settings)에서 읽어요.
+2. **프로젝트 이벤트** — `webserver.server.setup` 이벤트를 등록해요. → [프로젝트 이벤트](/docs/plugins/guides/project-events)
+3. **스크립트 API** — 전역 `WebServer`를 노출해요. → [스크립트에 API 노출하기](/docs/plugins/guides/script-api)
+4. **홈 위젯** — 위젯을 지원하지 않는 앱에서도 플러그인이 켜지도록 `LinkageError`를 잡아요. → [홈 위젯](/docs/plugins/guides/widgets)
+5. **앱 이벤트 구독** — 프로젝트가 컴파일되면 라우터를 새로 만들고 설정 함수를 불러요. 구독은 플러그인 전용 코루틴 스코프에서 해서, `onDisable()`에서 한 번에 취소해요. → [이벤트](/docs/plugins/reference/events)
 6. **이미 컴파일된 프로젝트** — 플러그인이 켜지기 전에 컴파일된 프로젝트는 컴파일 이벤트를 다시 받지 않으므로 직접 처리해요.
 7. **서버 시작** — 포트 바인딩은 네트워크 작업이라 메인 스레드에서 할 수 없어요. 전용 단일 스레드에서 시작하고 멈춰요.
 
@@ -241,4 +241,4 @@ fun tr(english: String, korean: String): String =
     }
 ```
 
-로그, 설정 화면, 위젯 어디서나 `tr("Stopped", "중지됨")`처럼 써요. → [로그와 번역](/docs/reference/logging)
+로그, 설정 화면, 위젯 어디서나 `tr("Stopped", "중지됨")`처럼 써요. → [로그와 번역](/docs/plugins/reference/logging)

@@ -100,7 +100,7 @@ override fun onConfigUpdated(config: ConfigData, updated: Map<String, Set<String
 | `progress` | — | `progress`, `max`, `label` |
 | `textList` | — | `lines`, `monospace`, `copyable`, `maxVisible`, `emptyText` |
 
-`choice`, `multiChoice`, `info`, `progress`, `textList`과 `button`의 `style`/`confirm`/`action`은 **PluginCore 1.0.0 이상**에서 쓸 수 있어요. 전체 속성은 [설정 레퍼런스](/docs/reference/config#옵션-레퍼런스)에 있어요.
+`choice`, `multiChoice`, `info`, `progress`, `textList`과 `button`의 `style`/`confirm`/`action`은 **PluginCore 1.0.0 이상**에서 쓸 수 있어요. 전체 속성은 [설정 레퍼런스](/docs/plugins/reference/config#옵션-레퍼런스)에 있어요.
 
 모든 옵션에 공통으로 쓸 수 있는 속성도 있어요.
 
@@ -149,7 +149,7 @@ button {
 
 ## 다국어 문구
 
-설정 화면의 문구도 [번역 헬퍼](/docs/reference/logging#번역)로 앱 언어에 맞출 수 있어요. 웹 서버 플러그인은 아래처럼 작은 헬퍼를 만들어 써요.
+설정 화면의 문구도 [번역 헬퍼](/docs/plugins/reference/logging#번역)로 앱 언어에 맞출 수 있어요. 웹 서버 플러그인은 아래처럼 작은 헬퍼를 만들어 써요.
 
 ```kotlin
 fun tr(english: String, korean: String): String =

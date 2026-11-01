@@ -1,12 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { afterNavigate } from '$app/navigation';
-	import Icon from '#lib/components/Icon.svelte';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
 	import { getLocale, getMessages } from '#lib/i18n.ts';
 	import { docsHref } from '#lib/paths.ts';
-	import type { DocNavSection } from '#lib/docs/types.ts';
+	import type { DocCategory, DocNavCategory } from '#lib/docs/types.ts';
 
-	let { nav, current }: { nav: DocNavSection[]; current: string } = $props();
+	let {
+		nav,
+		current,
+		category
+	}: { nav: DocNavCategory[]; current: string; category: DocCategory | null } = $props();
+
+	const icons: Record<DocCategory, IconName> = { app: 'smartphone', neonjs: 'zap', plugins: 'plug' };
+	const active = $derived(nav.find((entry) => entry.id === category));
 
 	const locale = $derived(getLocale());
 	const t = $derived(getMessages());
@@ -14,11 +21,11 @@
 	let query = $state('');
 	const normalized = $derived(query.trim().toLowerCase());
 
-	// Matches page titles, descriptions and headings; heading hits link straight to their anchor.
+	// Searches every category. Matches page titles, descriptions and headings; heading hits link to their anchor.
 	const results = $derived.by(() => {
 		if (!normalized) return [];
 		return nav
-			.flatMap((section) => section.pages)
+			.flatMap((entry) => entry.sections.flatMap((section) => section.pages.map((page) => ({ ...page, category: entry.id }))))
 			.map((page) => {
 				const pageHit =
 					page.title.toLowerCase().includes(normalized) || page.description.toLowerCase().includes(normalized);
@@ -62,7 +69,10 @@
 				<ul class="results">
 					{#each results as { page, headings } (page.slug)}
 						<li>
-							<a href={docsHref(locale, page.slug)} class="result-page">{page.title}</a>
+							<a href={docsHref(locale, page.slug)} class="result-page">
+								<span class="result-category">{t.docs.categories[page.category]}</span>
+								{page.title}
+							</a>
 							{#if headings.length}
 								<ul>
 									{#each headings as heading (heading.id)}
@@ -77,7 +87,22 @@
 				<p class="empty">{t.docs.noResults}</p>
 			{/if}
 		{:else}
-			{#each nav as section (section.id)}
+			<ul class="categories" aria-label={t.docs.categoryLabel}>
+				{#each nav as entry (entry.id)}
+					<li>
+						<a
+							href={docsHref(locale, entry.slug)}
+							class:active={entry.id === category}
+							aria-current={entry.slug === current ? 'page' : undefined}
+						>
+							<Icon name={icons[entry.id]} size={16} />
+							{t.docs.categories[entry.id]}
+						</a>
+					</li>
+				{/each}
+			</ul>
+
+			{#each active?.sections ?? [] as section (section.id)}
 				<div class="group">
 					<p class="group-title">{t.docs.sections[section.id]}</p>
 					<ul>
@@ -140,6 +165,41 @@
 		font: inherit;
 		font-size: 0.875rem;
 		outline: none;
+	}
+
+	.categories {
+		display: grid;
+		gap: 4px;
+		margin-bottom: 22px;
+		padding-bottom: 18px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.categories a {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 8px 12px;
+		border: 1px solid transparent;
+		border-radius: var(--radius-sm);
+		color: var(--text-muted);
+		font-size: 0.9rem;
+		font-weight: 600;
+		transition:
+			color 0.15s,
+			background-color 0.15s,
+			border-color 0.15s;
+	}
+
+	.categories a:hover {
+		color: var(--text);
+		background: rgb(127 127 127 / 0.1);
+	}
+
+	.categories a.active {
+		border-color: rgb(223 193 153 / 0.35);
+		background: var(--accent-soft);
+		color: var(--accent);
 	}
 
 	.group + .group {
@@ -206,6 +266,15 @@
 	.result-page {
 		color: var(--text);
 		font-weight: 600;
+	}
+
+	.result-category {
+		display: block;
+		color: var(--text-faint);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
 	}
 
 	.results ul a {

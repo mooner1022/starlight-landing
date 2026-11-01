@@ -1,6 +1,7 @@
 import { page } from '$app/state';
 import type { Channel } from '#lib/versions.ts';
 import type { IconName } from '#lib/components/Icon.svelte';
+import type { DocCategory, DocSection } from '#lib/docs/types.ts';
 
 export type Locale = 'ko' | 'en';
 
@@ -171,8 +172,8 @@ const ko = {
 		back: '홈으로'
 	},
 	docs: {
-		title: '플러그인 개발 문서',
-		metaSuffix: 'StarLight 플러그인 문서',
+		title: '문서',
+		metaSuffix: 'StarLight 문서',
 		navLabel: '문서 목차',
 		search: '문서 검색',
 		noResults: '일치하는 문서가 없어요.',
@@ -183,12 +184,18 @@ const ko = {
 		fallback: '',
 		copy: '복사',
 		copied: '복사됨',
+		categoryLabel: '문서 분류',
+		categories: {
+			app: '앱 사용법',
+			neonjs: 'NeonJS',
+			plugins: '플러그인 개발'
+		} satisfies Record<DocCategory, string>,
 		sections: {
 			start: '시작하기',
 			guides: '가이드',
-			reference: 'API 레퍼런스',
+			reference: '레퍼런스',
 			sdk: 'SDK'
-		},
+		} satisfies Record<DocSection, string>,
 		sdk: {
 			title: '최신 SDK',
 			channel: 'nightly',
@@ -375,8 +382,8 @@ const en: Messages = {
 		back: 'Back to home'
 	},
 	docs: {
-		title: 'Plugin developer docs',
-		metaSuffix: 'StarLight plugin docs',
+		title: 'Docs',
+		metaSuffix: 'StarLight docs',
 		navLabel: 'Docs navigation',
 		search: 'Search docs',
 		noResults: 'No pages match.',
@@ -387,10 +394,16 @@ const en: Messages = {
 		fallback: 'This page is only available in Korean for now.',
 		copy: 'Copy',
 		copied: 'Copied',
+		categoryLabel: 'Docs categories',
+		categories: {
+			app: 'Using the app',
+			neonjs: 'NeonJS',
+			plugins: 'Plugin development'
+		},
 		sections: {
 			start: 'Getting started',
 			guides: 'Guides',
-			reference: 'API reference',
+			reference: 'Reference',
 			sdk: 'SDK'
 		},
 		sdk: {

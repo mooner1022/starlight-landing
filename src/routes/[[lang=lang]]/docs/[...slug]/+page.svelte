@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-	<title>{doc.title} — {t.docs.metaSuffix}</title>
+	<title>{doc.slug ? `${doc.title} — ${t.docs.metaSuffix}` : doc.title}</title>
 	{#if doc.description}<meta name="description" content={doc.description} />{/if}
 </svelte:head>
 

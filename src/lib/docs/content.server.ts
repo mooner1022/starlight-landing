@@ -1,14 +1,17 @@
 /*
- * The wiki's pages are markdown files in src/docs/<locale>/. The folder names the sidebar section
- * (or `section:` in the frontmatter), and `order:` sorts pages within it. `index.md` is the wiki's
- * front page. A locale without its own copy of a page falls back to the Korean one.
+ * The wiki's pages are markdown files in src/docs/<locale>/<category>/<section>/. The first folder names
+ * the category (app, neonjs, plugins), the second the sidebar section, or set `section:` in the
+ * frontmatter. `order:` sorts pages within a section. `<category>/index.md` is a category's front page
+ * and `index.md` the wiki's. A locale without its own copy of a page falls back to the Korean one.
  */
 import type { Locale } from '#lib/i18n.ts';
 import { renderMarkdown } from '#lib/docs/markdown.server.ts';
 import {
+	DOC_CATEGORIES,
 	DOC_SECTIONS,
+	type DocCategory,
 	type DocHeading,
-	type DocNavSection,
+	type DocNavCategory,
 	type DocPage,
 	type DocSection
 } from '#lib/docs/types.ts';
@@ -33,7 +36,9 @@ interface Source {
 	locale: Locale;
 	slug: string;
 	file: string;
-	section: DocSection;
+	/** Null only for the wiki's front page. */
+	category: DocCategory | null;
+	section: DocSection | null;
 	order: number;
 	title: string;
 	description: string;
@@ -62,13 +67,21 @@ const sources: Source[] = Object.entries(files).map(([path, raw]) => {
 	if (!locale) throw new Error(`Docs file outside src/docs/<ko|en>/: ${path}`);
 	const { data, body } = parseFrontmatter(raw);
 	const slug = file === 'index' ? '' : file.replace(/\/index$/, '');
-	const section = (data.section ?? file.split('/')[0]) as DocSection;
-	if (!DOC_SECTIONS.includes(section)) throw new Error(`Unknown docs section "${section}" in ${path}`);
 	if (!data.title) throw new Error(`Docs page without a title: ${path}`);
+	let category: DocCategory | null = null;
+	let section: DocSection | null = null;
+	if (slug) {
+		const folders = file.split('/');
+		category = folders[0] as DocCategory;
+		if (!DOC_CATEGORIES.includes(category)) throw new Error(`Unknown docs category "${category}" in ${path}`);
+		section = (data.section ?? (folders.length > 2 ? folders[1] : undefined)) as DocSection;
+		if (!DOC_SECTIONS.includes(section)) throw new Error(`Unknown or missing docs section "${section}" in ${path}`);
+	}
 	return {
 		locale: locale as Locale,
 		slug,
 		file: `${file}.md`,
+		category,
 		section,
 		order: Number(data.order ?? 100),
 		title: data.title,
@@ -78,8 +91,12 @@ const sources: Source[] = Object.entries(files).map(([path, raw]) => {
 	};
 });
 
+// The front page sorts first (index -1), then categories, sections and `order:`.
+const rank = <T>(list: readonly T[], value: T | null) => (value === null ? -1 : list.indexOf(value));
 const byOrder = (a: Source, b: Source) =>
-	DOC_SECTIONS.indexOf(a.section) - DOC_SECTIONS.indexOf(b.section) || a.order - b.order;
+	rank(DOC_CATEGORIES, a.category) - rank(DOC_CATEGORIES, b.category) ||
+	rank(DOC_SECTIONS, a.section) - rank(DOC_SECTIONS, b.section) ||
+	a.order - b.order;
 
 /** Pages of a locale, falling back to Korean for pages it doesn't have. */
 function pagesFor(locale: Locale): Source[] {
@@ -107,32 +124,39 @@ function render(source: Source, locale: Locale) {
 	return rendered;
 }
 
-export async function getNavigation(locale: Locale): Promise<DocNavSection[]> {
+export async function getNavigation(locale: Locale): Promise<DocNavCategory[]> {
 	const pages = pagesFor(locale);
 	const headings = await Promise.all(pages.map((page) => render(page, locale).then((r) => r.headings)));
-	return DOC_SECTIONS.map((id) => ({
-		id,
-		pages: pages
-			.map((page, i) => ({ page, headings: headings[i] }))
-			.filter(({ page }) => page.section === id)
-			.map(({ page, headings }) => ({
-				slug: page.slug,
-				title: page.title,
-				description: page.description,
-				headings: headings.map(({ depth, id, text }): DocHeading => ({ depth, id, text }))
-			}))
-	})).filter((section) => section.pages.length > 0);
+	const entries = pages.map((page, i) => ({ page, headings: headings[i] }));
+	return DOC_CATEGORIES.map((category) => ({
+		id: category,
+		slug: category,
+		sections: DOC_SECTIONS.map((id) => ({
+			id,
+			pages: entries
+				.filter(({ page }) => page.category === category && page.section === id)
+				.map(({ page, headings }) => ({
+					slug: page.slug,
+					title: page.title,
+					description: page.description,
+					headings: headings.map(({ depth, id, text }): DocHeading => ({ depth, id, text }))
+				}))
+		})).filter((section) => section.pages.length > 0)
+	})).filter((category) => category.sections.length > 0);
 }
 
 export async function getPage(locale: Locale, slug: string): Promise<DocPage | null> {
-	const pages = pagesFor(locale);
-	const index = pages.findIndex((page) => page.slug === slug);
-	if (index < 0) return null;
-	const source = pages[index];
+	const all = pagesFor(locale);
+	const source = all.find((page) => page.slug === slug);
+	if (!source) return null;
+	// The pager stays within the page's category; the front page has none.
+	const pages = source.category ? all.filter((page) => page.category === source.category) : [];
+	const index = pages.indexOf(source);
 	const { html, headings } = await render(source, locale);
 	const link = (page: Source | undefined) => (page ? { slug: page.slug, title: page.title } : null);
 	return {
 		slug: source.slug,
+		category: source.category,
 		section: source.section,
 		title: source.title,
 		description: source.description,
