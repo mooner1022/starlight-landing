@@ -11,19 +11,25 @@
 	const t = $derived(getMessages());
 	// The banner sits above the sidebar, so it reads the current page from the child route's data.
 	const doc = $derived(page.data.doc as DocPage | undefined);
+	// A category's front page shows the category; its other pages add the section.
+	const eyebrow = $derived.by(() => {
+		if (!doc?.category) return t.docs.title;
+		const category = t.docs.categories[doc.category];
+		return doc.slug === doc.category || !doc.section ? category : `${category} · ${t.docs.sections[doc.section]}`;
+	});
 </script>
 
 <section class="banner night">
 	<Starfield />
 	<div class="container wide">
-		<p class="eyebrow">{doc && doc.slug ? t.docs.sections[doc.section] : t.docs.title}</p>
+		<p class="eyebrow">{eyebrow}</p>
 		<h1>{doc?.title ?? t.docs.title}</h1>
 		{#if doc?.description}<p class="lead">{doc.description}</p>{/if}
 	</div>
 </section>
 
 <div class="container wide docs">
-	<DocsSidebar nav={data.nav} current={doc?.slug ?? ''} />
+	<DocsSidebar nav={data.nav} current={doc?.slug ?? ''} category={doc?.category ?? null} />
 	<div class="docs-main">
 		{@render children()}
 	</div>

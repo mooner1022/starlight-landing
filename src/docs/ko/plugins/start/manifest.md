@@ -80,7 +80,7 @@ nightly에서는 앱보다 새로운 PluginCore를 요구하는 플러그인(`ap
 | 정식 앱과 nightly 앱 모두 지원 | **`0.3.2`** |
 | nightly 앱(PluginCore 1.0.0) 전용 | `1.0.0` |
 
-`0.3.2`로 두더라도 PluginCore 1.0.0에서 추가된 API(위젯 DSL 등)를 쓴다면, 정식 앱에서는 그 부분이 `LinkageError`로 실패해요. [홈 위젯의 호환성](/docs/guides/widgets#호환성)처럼 감싸서 등록하세요.
+`0.3.2`로 두더라도 PluginCore 1.0.0에서 추가된 API(위젯 DSL 등)를 쓴다면, 정식 앱에서는 그 부분이 `LinkageError`로 실패해요. [홈 위젯의 호환성](/docs/plugins/guides/widgets#호환성)처럼 감싸서 등록하세요.
 
 ## Gradle에서 생성하기
 

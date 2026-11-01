@@ -73,7 +73,7 @@ val ClockWidget = widget("clock_status") {
 | `launch { }` | 위젯 수명에 묶인 코루틴을 실행해요(메인 스레드). |
 | `repeatWhile(state) { }` | 생명주기가 `state` 이상일 때만 블록을 실행해요. |
 | `ticker(period) { }` | 화면이 보이는 동안(`RESUMED`) `period`마다 블록을 실행해요. |
-| `on<T> { }` | 화면이 보이는 동안(`STARTED`) [앱 이벤트](/docs/reference/events) `T`를 받아요. |
+| `on<T> { }` | 화면이 보이는 동안(`STARTED`) [앱 이벤트](/docs/plugins/reference/events) `T`를 받아요. |
 | `onResize { span -> }` | 사용자가 위젯 크기를 바꿨을 때 호출돼요. |
 
 위젯이 홈 화면에서 사라지면 `launch`, `ticker`, `on`으로 시작한 작업은 모두 취소돼요. 블록 안에서 발생한 예외는 앱이 위젯 오류로 처리해요.
@@ -105,4 +105,4 @@ try {
 
 ## 앱 스타일에 맞추기
 
-위젯 DSL은 뷰를 직접 만들게 하므로, 색과 여백을 앱에 맞추는 건 플러그인 몫이에요. 웹 서버 플러그인은 앱의 리소스 이름(`card_radius`, `widget_cell_height` 등)을 `resources.getIdentifier()`로 찾아 쓰고, 찾지 못하면 기본값을 쓰는 헬퍼(`hostColor`, `hostDimen`)를 만들어 써요. [웹 서버 플러그인 살펴보기](/docs/guides/webserver-example#홈-위젯)에서 구성을 볼 수 있어요.
+위젯 DSL은 뷰를 직접 만들게 하므로, 색과 여백을 앱에 맞추는 건 플러그인 몫이에요. 웹 서버 플러그인은 앱의 리소스 이름(`card_radius`, `widget_cell_height` 등)을 `resources.getIdentifier()`로 찾아 쓰고, 찾지 못하면 기본값을 쓰는 헬퍼(`hostColor`, `hostDimen`)를 만들어 써요. [웹 서버 플러그인 살펴보기](/docs/plugins/guides/webserver-example#홈-위젯)에서 구성을 볼 수 있어요.

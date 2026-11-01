@@ -67,7 +67,7 @@ abstract class Project : CoroutineScope, ProjectLifecycleOwner
 | 메서드 | 설명 |
 |---|---|
 | `callFunction(name, args, onException = {})` | 스크립트의 함수를 호출해요. 스크립트 오류는 `onException`으로 전달돼요. |
-| `isEventCallAllowed(eventId): Boolean` | 프로젝트가 그 [프로젝트 이벤트](/docs/guides/project-events)를 허용했는지 알려 줘요. |
+| `isEventCallAllowed(eventId): Boolean` | 프로젝트가 그 [프로젝트 이벤트](/docs/plugins/guides/project-events)를 허용했는지 알려 줘요. |
 | `compile(throwException = false): Boolean` | 다시 컴파일해요. 이전 스코프는 정리돼요. |
 | `compileAsync(): Flow<Pair<PipelineStage<*, *>, Int>>` | 컴파일 단계와 진행률을 흘려보내며 컴파일해요. |
 | `setEnabled(enabled): Boolean` | 프로젝트를 켜거나 꺼요. |
@@ -90,7 +90,7 @@ inline fun <reified T : ProjectEvent> Project.fireEvent(
 ): Boolean
 ```
 
-프로젝트가 그 이벤트를 허용하지 않으면 `false`를 돌려줘요. 자세한 내용은 [프로젝트 이벤트](/docs/guides/project-events#프로젝트-하나에-보내기)를 참고하세요.
+프로젝트가 그 이벤트를 허용하지 않으면 `false`를 돌려줘요. 자세한 내용은 [프로젝트 이벤트](/docs/plugins/guides/project-events#프로젝트-하나에-보내기)를 참고하세요.
 
 ## ProjectInfo
 

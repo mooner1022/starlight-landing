@@ -11,7 +11,7 @@ export function localizedHref(locale: Locale, key: PageKey = 'home'): string {
 		: resolve('/[[lang=lang]]/app-privacy', { lang });
 }
 
-/** A page of the plugin docs; an empty slug is the docs' front page. */
+/** A page of the docs; an empty slug is the docs' front page, a category id that category's front page. */
 export function docsHref(locale: Locale, slug = ''): string {
 	return resolve('/[[lang=lang]]/docs/[...slug]', { lang: locale === 'en' ? 'en' : undefined, slug });
 }

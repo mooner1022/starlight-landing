@@ -4,7 +4,7 @@ description: 로그를 남기는 가장 작은 플러그인을 만들어 기기�
 order: 2
 ---
 
-[개발 환경 준비](/docs/start/setup)를 마쳤다면, 켜지고 꺼질 때 로그를 남기는 플러그인을 만들어 볼게요.
+[개발 환경 준비](/docs/plugins/start/setup)를 마쳤다면, 켜지고 꺼질 때 로그를 남기는 플러그인을 만들어 볼게요.
 
 ## 1. 플러그인 클래스 작성
 
@@ -59,10 +59,10 @@ starlight {
 }
 ```
 
-`manifest { }` 대신 `src/main/assets/starlight.json`을 직접 써도 돼요. 이때는 Gradle 플러그인이 파일을 검증만 해요. 키와 규칙은 [starlight.json](/docs/start/manifest)에서 자세히 볼 수 있어요.
+`manifest { }` 대신 `src/main/assets/starlight.json`을 직접 써도 돼요. 이때는 Gradle 플러그인이 파일을 검증만 해요. 키와 규칙은 [starlight.json](/docs/plugins/start/manifest)에서 자세히 볼 수 있어요.
 
 > [!TIP]
-> 정식 앱(0.3.4b)에서도 동작해야 한다면 `apiVersion`을 `0.3.2`로 두세요. 정식 앱과 nightly 앱이 모두 이 플러그인을 불러와요. nightly 앱 전용이라면 `1.0.0`으로 둬도 돼요. 이유는 [API 버전 호환](/docs/start/manifest#api-버전-호환)에 정리해 두었어요.
+> 정식 앱(0.3.4b)에서도 동작해야 한다면 `apiVersion`을 `0.3.2`로 두세요. 정식 앱과 nightly 앱이 모두 이 플러그인을 불러와요. nightly 앱 전용이라면 `1.0.0`으로 둬도 돼요. 이유는 [API 버전 호환](/docs/plugins/start/manifest#api-버전-호환)에 정리해 두었어요.
 
 ## 3. 빌드
 
@@ -94,9 +94,9 @@ starlight {
 
 StarLight의 로그캣이 스트리밍돼요(Ctrl+C로 종료). `Hello, StarLight! (Hello v1.0.0)`이 보이면 성공이에요. 앱의 로그 화면과 플러그인 목록에서도 확인할 수 있어요.
 
-플러그인이 목록에 보이지 않는다면 로그캣에서 플러그인을 제외한 이유를 찾아보세요. API 버전이 맞지 않거나, 필요한 의존성 플러그인이 없을 때 이유가 로그로 남아요. [빌드와 배포](/docs/start/build-and-deploy#문제-해결)에 자주 있는 경우를 정리해 두었어요.
+플러그인이 목록에 보이지 않는다면 로그캣에서 플러그인을 제외한 이유를 찾아보세요. API 버전이 맞지 않거나, 필요한 의존성 플러그인이 없을 때 이유가 로그로 남아요. [빌드와 배포](/docs/plugins/start/build-and-deploy#문제-해결)에 자주 있는 경우를 정리해 두었어요.
 
 ## 다음 단계
 
-- 스크립트에서 쓸 객체를 제공하려면 → [스크립트에 API 노출하기](/docs/guides/script-api)
-- 플러그인 설정 화면을 만들려면 → [설정 화면 만들기](/docs/guides/settings)
+- 스크립트에서 쓸 객체를 제공하려면 → [스크립트에 API 노출하기](/docs/plugins/guides/script-api)
+- 플러그인 설정 화면을 만들려면 → [설정 화면 만들기](/docs/plugins/guides/settings)
