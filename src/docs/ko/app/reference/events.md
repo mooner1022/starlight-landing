@@ -46,7 +46,7 @@ function onMessage(event) { … }
 이벤트는 프로젝트마다 순서대로 대기열에 들어가 차례로 실행돼요. 대기열이 가득 차면(256개) 가장 오래된 이벤트부터 버려져요.
 
 > [!WARNING]
-> 이벤트 함수에서 처리하지 않은 오류가 나면 로그에 **실행 중 에러 발생**이 남고, 프로젝트 설정의 **오류 발생시 비활성화**(기본 켜짐)에 따라 프로젝트가 꺼져요.
+> 이벤트 함수에서 처리하지 않은 오류가 나면 로그에 **실행 중 에러 발생**이 남아요. 프로젝트 설정의 **오류 발생시 비활성화**(기본 켜짐)가 켜져 있으면 프로젝트가 꺼지고 컴파일된 코드도 내려가요. 그동안은 디버그 룸에서도 불리지 않으니, 다시 컴파일하고 켜세요.
 
 ## onMessage
 
@@ -66,7 +66,7 @@ export function onMessage(event) {
 | `sender` | 객체 | 보낸 사람이에요. 아래 표를 보세요. |
 | `room` | 객체 | 메시지가 온 방이에요. 아래 표를 보세요. |
 | `packageName` | 문자열 | 메신저 앱의 패키지 이름이에요 (`com.kakao.talk`). |
-| `hasMention` | 불리언 | 나를 멘션한 메시지인지 알려 줘요. |
+| `hasMention` | 불리언 | 멘션이 들어 있는 메시지인지 알려 줘요. 누구를 멘션했는지는 가리지 않아요. |
 | `chatLogId` | 숫자 | 카카오톡 메시지 ID예요. 디버그 룸에서는 `-1`이에요. |
 | `image` | `Bitmap` 또는 `null` | 알림에 붙은 이미지예요. 대부분 `null`이에요. |
 
@@ -129,7 +129,10 @@ function response(room, msg, sender, isGroupChat, replier, imageDB) {
 | `replier` | 답장 객체예요. 아래 표를 보세요. |
 | `imageDB` | 프로필 이미지 객체예요. `getProfileBase64()`, `getProfileHash()`, `getProfileBitmap()`이 있어요. |
 
-일곱 번째 인자 `packageName`은 넘어오지 않아요(`undefined`). 패키지 이름이 필요하면 `onMessage`를 쓰세요.
+일곱 번째 인자 `packageName`은 메신저 앱의 패키지 이름이에요 (`com.kakao.talk`).
+
+> [!NOTE]
+> Google Play 판과 베타 채널의 1.0.0-261103에는 `packageName`이 넘어오지 않아요(`undefined`).
 
 | `replier` 메서드 | 설명 |
 |---|---|
@@ -160,10 +163,16 @@ export function onNotificationPosted(sbn) {
 프로젝트 설정의 **실험적 기능 → 사용자 지정 버튼**에 버튼을 추가하면 프로젝트 카드에 버튼이 생겨요. 버튼을 누르면 버튼에 정한 ID가 `buttonId`로 넘어와요. 프로젝트가 컴파일되어 있어야 하고, 꺼져 있어도 불려요.
 
 ```javascript title="NeonJS"
+let count = 0;
+
+export function onMessage(event) {
+    count++;
+}
+
 export function onProjectButtonClicked(buttonId) {
     if (buttonId === "reset") {
-        DataBase.setDataBase("count.txt", "0");
-        toast("초기화했어요");
+        count = 0;
+        Log.i("button", "초기화했어요");
     }
 }
 ```
