@@ -4,8 +4,11 @@ const VERSION_CHECK_URL = `${REPO_RAW_URL}/version.json`;
 export const CHANNELS = ['release', 'beta', 'snapshot'] as const;
 export type Channel = (typeof CHANNELS)[number];
 
-/** The channel the hero download button points to. All channels are listed in the download section. */
+/** The channel the hero's APK button preselects. All channels are listed in the download section. */
 export const PRIMARY_CHANNEL: Channel = 'beta';
+
+/** The Google Play build: the hero's main download. Same app ID as the APKs, without plugins or self-updates. */
+export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=dev.mooner.starlight';
 
 export interface Version {
 	version: string;
