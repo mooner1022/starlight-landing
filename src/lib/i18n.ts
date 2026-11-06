@@ -43,7 +43,7 @@ const ko = {
 		unavailable: 'GitHub에서 받기',
 		note: 'Android 8.0 이상 · 무료',
 		source: 'GPL-3.0 오픈소스',
-		mockupAlt: 'StarLight 앱의 홈 화면과 프로젝트 목록 화면',
+		mockupAlt: 'StarLight 앱의 홈 화면과 StarLight AI 화면',
 		scroll: '스크롤'
 	},
 	features: {
@@ -308,7 +308,7 @@ const en: Messages = {
 		unavailable: 'Get it on GitHub',
 		note: 'Android 8.0+ · Free',
 		source: 'GPL-3.0 open source',
-		mockupAlt: 'StarLight home screen and project list',
+		mockupAlt: 'StarLight home screen and StarLight AI',
 		scroll: 'Scroll'
 	},
 	features: {
