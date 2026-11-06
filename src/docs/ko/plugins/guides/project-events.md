@@ -33,8 +33,16 @@ class AlarmEvent : ProjectEvent() {
 
     // 새 프로젝트를 만들 때 함수 위에 붙는 주석이에요. (선택)
     override val functionComment: String = "알람이 울릴 때 호출돼요."
+
+    // 이벤트 목록에서 이름과 함께 보이는, 이벤트가 일어나는 때예요. (선택, PluginCore 1.0.0 이상)
+    override val description: String = translate {
+        Locale.ENGLISH { "When an alarm goes off" }
+        Locale.KOREAN  { "알람이 울릴 때" }
+    }
 }
 ```
+
+프로젝트 설정의 **받을 이벤트** 목록은 이벤트마다 `usage`, `name`, `description`, 이벤트 ID를 보여 줘요. `usage`는 스크립트가 이벤트를 받는 방법이고, 기본값은 `onAlarm(time, label)`처럼 함수 이름과 인자예요. 함수가 아닌 다른 방법으로 전달하는 이벤트라면 `usage`를 바꾸고, `dispatch()`와 `generateCode()`를 재정의해 전달 방법과 새 프로젝트의 기본 코드를 정할 수 있어요.
 
 `typedAs`는 `ProjectEvent` 안에서 쓸 수 있는 중위 함수예요. `typedAs<String>("time")` 형태로도 쓸 수 있어요.
 
@@ -59,7 +67,7 @@ override fun onEnable() {
 
 ## 사용자 쪽
 
-1. 프로젝트 설정의 이벤트 목록에서 플러그인 이벤트를 허용해요. 프로젝트는 기본으로 `starlight.*`(StarLight 기본 이벤트)만 허용해요. 목록에는 와일드카드도 쓸 수 있어서, `clock.*`은 `clock` 플러그인의 모든 이벤트를 허용해요.
+1. 프로젝트 설정의 [받을 이벤트](/docs/app/guides/projects#받을-이벤트)에서 플러그인의 이벤트를 체크해요. 이벤트는 플러그인별로 묶여 있고, 프로젝트의 API 방식과 상관없이 받을 수 있어요. **ID 직접 편집**에서는 와일드카드도 쓸 수 있어서, `clock.*`은 `clock` 플러그인의 모든 이벤트를 받아요.
 2. 스크립트에 `functionName`과 같은 이름의 함수를 작성해요.
 
 ```javascript title="main.js (Rhino)"
@@ -93,7 +101,7 @@ fireProjectEvent<AlarmEvent>("07:30", "기상") { project, e ->
 
 - 컴파일되어 있어요(`project.isCompiled`).
 - 켜져 있어요(`project.info.isEnabled`).
-- 이 이벤트를 허용했어요(`project.isEventCallAllowed(eventId)`).
+- 받을 이벤트에 이 이벤트가 들어 있어요(`project.isEventCallAllowed(eventId)`).
 
 ### 프로젝트 하나에 보내기
 

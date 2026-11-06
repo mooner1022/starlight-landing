@@ -24,8 +24,26 @@
 <section class="container content">
 	<div class="card">
 		<span class="icon"><Icon name="shield" size={22} /></span>
-		<p>{t.privacy.body}</p>
+		<div class="summary">
+			<p>{t.privacy.body}</p>
+			<p class="effective">{t.privacy.effective}</p>
+		</div>
 	</div>
+
+	{#each t.privacy.sections as section (section.title)}
+		<section class="policy">
+			<h2>{section.title}</h2>
+			{#each section.body as paragraph (paragraph)}
+				<p>{paragraph}</p>
+			{/each}
+		</section>
+	{/each}
+
+	<p class="contact">
+		{t.privacy.contactBefore}<a href="https://github.com/mooner1022/StarLight/issues" rel="noopener"
+			>{t.privacy.contactLink}</a
+		>{t.privacy.contactAfter}
+	</p>
 	<a class="back" href={localizedHref(locale)}>
 		<span class="arrow"><Icon name="arrowRight" size={18} /></span>
 		{t.privacy.back}
@@ -63,6 +81,50 @@
 		background: var(--surface);
 		box-shadow: var(--shadow);
 		font-size: 1.0625rem;
+	}
+
+	.summary {
+		display: grid;
+		gap: 8px;
+	}
+
+	.effective {
+		color: var(--text-faint);
+		font-size: 0.875rem;
+	}
+
+	.policy {
+		margin-top: 40px;
+	}
+
+	.policy h2 {
+		margin-bottom: 12px;
+		font-size: 1.25rem;
+		font-weight: 700;
+	}
+
+	.policy p {
+		color: var(--text-muted);
+		line-height: 1.75;
+	}
+
+	.policy p + p {
+		margin-top: 10px;
+	}
+
+	.contact {
+		margin-top: 40px;
+		color: var(--text-muted);
+	}
+
+	.contact a {
+		color: var(--accent);
+		font-weight: 600;
+	}
+
+	.contact a:hover {
+		text-decoration: underline;
+		text-underline-offset: 3px;
 	}
 
 	.icon {

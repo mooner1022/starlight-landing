@@ -12,9 +12,9 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 
 | 버전 | 날짜 | 포함된 앱 |
 |---|---|---|
-| **1.0.0** | 2026-10-30 | StarLight nightly (아직 정식 앱에 없음) |
+| **1.0.0** | 2026-10-30 | StarLight 1.0.0 |
 | 0.3.3 | 2026-10-30 | nightly 중간 버전 |
-| **0.3.2** | 2025-06-05 | StarLight 0.3.4b (현재 정식 앱) |
+| **0.3.2** | 2025-06-05 | StarLight 0.3.4b |
 | 0.3.0 | 2024-02-24 | |
 | 0.2.0 | 2024-02-08 | StarLight v0.2.0a |
 | 0.1.0 | 2022 | |
@@ -56,7 +56,7 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 
 ### 0.3.2
 
-2025-06-05 · **StarLight 0.3.4b**. 현재 정식 앱에 들어 있는 버전이에요.
+2025-06-05 · **StarLight 0.3.4b**. 1.0.0 이전 앱에 들어 있는 버전이에요.
 
 - `Language.eval()`에 `options` 파라미터를 추가했어요.
 - 기본 코드 생성기를 최적화했어요.

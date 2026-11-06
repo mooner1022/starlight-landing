@@ -20,16 +20,28 @@ function onMessage(event) { … }
 |---|---|---|
 | `onMessage(event)` | `starlight.message.create` | 메시지를 받았을 때 |
 | `onMessageDeleted(event)` | `starlight.message.delete` | 카카오톡에서 가장 최근 메시지가 삭제됐을 때 |
-| `response(room, msg, sender, isGroupChat, replier, imageDB)` | `starlight.message.legacy` | 메시지를 받았을 때. **레거시 이벤트 사용**을 켜야 해요. |
+| `response(room, msg, sender, isGroupChat, replier, imageDB)` | `starlight.message.legacy` | 메시지를 받았을 때. 프로젝트의 API 방식에 **메신저봇 레거시**가 있어야 해요. |
 | `onNotificationPosted(sbn)` | `starlight.notification.post` | 아무 앱이나 알림을 올렸을 때. **onNotificationPosted 이벤트 사용**을 켜야 해요. |
 | `onStartCompile()` | `starlight.project.compile` | 이미 컴파일된 프로젝트를 다시 컴파일하기 직전 |
 | `onProjectButtonClicked(buttonId)` | — | 프로젝트 카드의 사용자 지정 버튼을 눌렀을 때 |
+
+## 메신저봇 API2 이벤트
+
+**메신저봇 API2** 방식의 이벤트는 함수 이름이 아니라 `bot.addListener()`로 등록한 리스너로 전달돼요. 허용 이벤트 ID는 아래와 같고, 리스너와 인자는 [BotManager](/docs/app/reference/script-api#이벤트-방식-botmanager-메신저봇-api2)를 보세요.
+
+| 리스너 (`Event.…`) | 이벤트 ID |
+|---|---|
+| `MESSAGE` | `starlight.api2.message` |
+| `COMMAND` | `starlight.api2.command` |
+| `NOTIFICATION_POSTED` | `starlight.api2.notification_posted` |
+| `NOTIFICATION_REMOVED` | `starlight.api2.notification_removed` |
+| `START_COMPILE` | `starlight.api2.start_compile` |
 
 이벤트는 아래 조건을 모두 만족할 때만 불려요.
 
 - 설정의 **전역 전원**이 켜져 있어요.
 - 프로젝트가 컴파일되어 있고, 켜져 있어요. (디버그 룸과 사용자 지정 버튼은 꺼져 있어도 불러요.)
-- 프로젝트 설정의 **호출이 허용된 이벤트**에 그 이벤트 ID가 들어 있어요. 기본값 `starlight.*`은 위의 기본 이벤트를 모두 허용해요.
+- 프로젝트 설정의 [받을 이벤트](/docs/app/guides/projects#받을-이벤트)에서 그 이벤트가 체크돼 있고, 프로젝트의 API 방식에 그 이벤트가 있어요.
 
 이벤트는 프로젝트마다 순서대로 대기열에 들어가 차례로 실행돼요. 대기열이 가득 차면(256개) 가장 오래된 이벤트부터 버려져요.
 
@@ -67,6 +79,7 @@ export function onMessage(event) {
 | `isGroupChat()` | 단체방이면 `true`예요. |
 | `isDebugRoom()` | 디버그 룸에서 온 메시지면 `true`예요. |
 | `send(message)` | 이 방에 메시지를 보내요. 성공하면 `true`예요. |
+| `sendMedia(files, options?)` | 이 방에 이미지·동영상·파일을 보내요. 디버그 룸에서도 돼요. 상대 경로는 받지 않으니, 프로젝트 안의 파일은 `MediaSharer.send(event, files)`로 보내세요. [파일 보내기](/docs/app/reference/script-api#파일-보내기-mediasharer-room.sendmedia)를 보세요. |
 | `markAsRead()` | 이 방의 메시지를 읽음으로 표시해요. |
 
 ### event.sender
@@ -98,7 +111,7 @@ export function onMessage(event) {
 
 ## response (레거시)
 
-메신저봇, 채자봇 같은 다른 앱의 봇 코드와 호환되는 함수예요. **설정 → 알림, 이벤트**에서 **레거시 이벤트 사용**을 켜야 불려요. 켜 두면 메시지마다 `onMessage` 다음에 `response`도 불려요.
+메신저봇, 채자봇 같은 다른 앱의 봇 코드와 호환되는 함수예요. 프로젝트의 [API 방식](/docs/app/guides/projects#api-방식)에 **메신저봇 레거시**가 있어야 불려요. **StarLight 오리지널**도 함께 고르면 메시지마다 `onMessage` 다음에 `response`도 불려요.
 
 ```javascript title="Rhino"
 function response(room, msg, sender, isGroupChat, replier, imageDB) {
@@ -157,4 +170,4 @@ export function onProjectButtonClicked(buttonId) {
 
 ## 플러그인 이벤트
 
-플러그인이 더한 이벤트도 같은 방식으로 받아요. 프로젝트 설정의 **호출이 허용된 이벤트**에 플러그인 이벤트 ID(예: `webserver.*`)를 더하고, 플러그인이 정한 이름의 함수를 만들어요. 함수 이름과 인자는 각 플러그인의 문서를 보세요.
+플러그인이 더한 이벤트도 같은 방식으로 받아요. 프로젝트 설정의 **받을 이벤트**에서 그 플러그인의 이벤트를 체크하고(ID로는 예: `webserver.*`), 플러그인이 정한 이름의 함수를 만들어요. 함수 이름과 인자는 각 플러그인의 문서를 보세요.

@@ -4,7 +4,7 @@
 	import { parseChangelog } from '#lib/changelog.ts';
 	import { getMessages } from '#lib/i18n.ts';
 	import { reveal } from '#lib/reveal.ts';
-	import { CHANNELS, changelogPageUrl, PRIMARY_CHANNEL, type Versions } from '#lib/versions.ts';
+	import { CHANNELS, changelogPageUrl, PLAY_STORE_URL, PRIMARY_CHANNEL, type Versions } from '#lib/versions.ts';
 
 	let {
 		versions,
@@ -31,35 +31,53 @@
 
 		<div class="layout" class:single={!versions}>
 			<div class="main">
-				<ul class="channels">
-					{#each CHANNELS as channel, i (channel)}
-						{@const version = versions?.[channel]}
-						{@const recommended = channel === PRIMARY_CHANNEL}
-						<li class="channel" class:recommended use:reveal={i * 0.06}>
-							<div class="channel-info">
-								<div class="channel-head">
-									<h3>{t.download.channels[channel].name}</h3>
-									{#if recommended}<span class="badge">{t.download.recommended}</span>{/if}
-									<code class="channel-version">{version ? `v${version.version}` : '—'}</code>
-								</div>
-								<p class="channel-body">{t.download.channels[channel].body}</p>
+				<div class="options">
+					<div class="channel recommended" use:reveal>
+						<div class="channel-info">
+							<div class="channel-head">
+								<h3>{t.download.play.name}</h3>
+								<span class="badge">{t.download.recommended}</span>
 							</div>
-							{#if version}
-								<a
-									class="button {recommended ? 'primary' : 'ghost'}"
-									href={version.downloadUrl}
-									onclick={() => onDownload(version.downloadUrl)}
-								>
-									<Icon name="download" size={18} />
-									{t.download.get}
-								</a>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-				{#if !versions}
-					<p class="status">{t.download.unavailable}</p>
-				{/if}
+							<p class="channel-body">{t.download.play.body}</p>
+						</div>
+						<a class="button primary" href={PLAY_STORE_URL} rel="noopener">
+							<Icon name="play" size={18} />
+							{t.download.play.get}
+						</a>
+					</div>
+
+					<div class="apk-head" use:reveal={0.06}>
+						<h3>{t.download.apk.title}</h3>
+						<p>{t.download.apk.body}</p>
+					</div>
+					<ul class="channels">
+						{#each CHANNELS as channel, i (channel)}
+							{@const version = versions?.[channel]}
+							<li class="channel" use:reveal={(i + 2) * 0.06}>
+								<div class="channel-info">
+									<div class="channel-head">
+										<h3>{t.download.channels[channel].name}</h3>
+										<code class="channel-version">{version ? `v${version.version}` : '—'}</code>
+									</div>
+									<p class="channel-body">{t.download.channels[channel].body}</p>
+								</div>
+								{#if version}
+									<a
+										class="button ghost"
+										href={version.downloadUrl}
+										onclick={() => onDownload(version.downloadUrl)}
+									>
+										<Icon name="download" size={18} />
+										{t.download.get}
+									</a>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+					{#if !versions}
+						<p class="status">{t.download.unavailable}</p>
+					{/if}
+				</div>
 
 				<ol class="steps" use:reveal={0.18}>
 					{#each t.download.steps as step, i (i)}
@@ -124,6 +142,29 @@
 		display: grid;
 		align-content: start;
 		gap: 24px;
+	}
+
+	/* Google Play, then the APK channels */
+	.options {
+		display: grid;
+		gap: 10px;
+	}
+
+	.apk-head {
+		margin-top: 8px;
+		padding: 0 4px;
+	}
+
+	.apk-head h3 {
+		font-size: 0.9375rem;
+		font-weight: 700;
+	}
+
+	.apk-head p {
+		margin-top: 2px;
+		color: var(--text-muted);
+		font-size: 0.8125rem;
+		line-height: 1.55;
 	}
 
 	/* Channels */

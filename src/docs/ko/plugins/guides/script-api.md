@@ -97,7 +97,7 @@ Kotlin `object`의 함수를 스크립트에서 정적 메서드로 부르려면
 - NeonJS 프로젝트는 ES 모듈로 실행돼요. 전역 API는 그대로 쓸 수 있지만, 이벤트 함수는 `export` 해야 해요.
 
 > [!NOTE]
-> NeonJS의 플러그인 API 노출은 StarLight nightly 기준이에요. 웹 서버 플러그인의 소스 주석처럼 "NeonJS는 아직 플러그인 API를 노출하지 않는다"고 적힌 자료는 그 이전 버전 이야기예요.
+> NeonJS의 플러그인 API 노출은 StarLight 1.0.0 기준이에요. 웹 서버 플러그인의 소스 주석처럼 "NeonJS는 아직 플러그인 API를 노출하지 않는다"고 적힌 자료는 그 이전 버전 이야기예요.
 
 ## 주의할 점
 

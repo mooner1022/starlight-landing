@@ -4,7 +4,7 @@
 	import Logo from '#lib/components/Logo.svelte';
 	import Starfield from '#lib/components/Starfield.svelte';
 	import { getMessages } from '#lib/i18n.ts';
-	import { PRIMARY_CHANNEL, type Versions } from '#lib/versions.ts';
+	import { PLAY_STORE_URL, PRIMARY_CHANNEL, type Versions } from '#lib/versions.ts';
 
 	let {
 		versions,
@@ -27,10 +27,14 @@
 			<p class="lead">{t.hero.lead}</p>
 
 			<div class="cta">
+				<a class="button primary download" href={PLAY_STORE_URL} rel="noopener">
+					<Icon name="play" size={20} />
+					<span>{t.hero.play}</span>
+				</a>
 				{#if versions && primary}
 					<!-- Falls back to the channel list in the download section when JS hasn't loaded. -->
 					<a
-						class="button primary download"
+						class="button ghost apk"
 						href="#download"
 						aria-haspopup="dialog"
 						onclick={(event) => {
@@ -38,25 +42,23 @@
 							onChoose(versions);
 						}}
 					>
-						<Icon name="download" size={20} />
-						<span>{t.hero.download}</span>
-						<span class="version">v{primary.version} · {t.download.channels[PRIMARY_CHANNEL].name}</span>
+						<Icon name="download" size={18} />
+						<span>{t.hero.apk}</span>
 					</a>
 				{:else}
-					<a class="button primary download" href="https://github.com/mooner1022/StarLight" rel="noopener">
-						<Icon name="github" size={20} />
+					<a class="button ghost apk" href="https://github.com/mooner1022/StarLight" rel="noopener">
+						<Icon name="github" size={18} />
 						<span>{t.hero.unavailable}</span>
 					</a>
 				{/if}
-				<a class="button ghost" href="https://github.com/mooner1022/StarLight" rel="noopener">
-					<Icon name="code" size={18} />
-					<span>{t.hero.source}</span>
-				</a>
 			</div>
 
 			<p class="note">
 				<Icon name="smartphone" size={16} />
-				{t.hero.note}
+				<span>
+					{t.hero.note} ·
+					<a href="https://github.com/mooner1022/StarLight" rel="noopener">{t.hero.source}</a>
+				</span>
 			</p>
 		</div>
 
@@ -212,21 +214,8 @@
 
 	.download {
 		min-height: 56px;
-		padding: 0 10px 0 24px;
+		padding: 0 24px;
 		font-size: 1.0625rem;
-	}
-
-	.download .version {
-		padding: 6px 12px;
-		border-radius: 999px;
-		background: rgb(30 23 9 / 0.12);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		white-space: nowrap;
-	}
-
-	.download:not(:has(.version)) {
-		padding-right: 24px;
 	}
 
 	.cta .ghost {
@@ -240,6 +229,16 @@
 		margin-top: 20px;
 		color: var(--text-faint);
 		font-size: 0.875rem;
+	}
+
+	.note a {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	.note a:hover {
+		color: var(--text-muted);
 	}
 
 	.visual {
@@ -311,10 +310,6 @@
 
 		.cta .button {
 			width: 100%;
-		}
-
-		.download {
-			justify-content: space-between;
 		}
 	}
 </style>
