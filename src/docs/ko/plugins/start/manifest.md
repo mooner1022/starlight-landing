@@ -70,17 +70,17 @@ order: 3
 
 | 앱 | 받아들이는 `api_version` |
 |---|---|
-| StarLight 0.3.4b (정식, PluginCore 0.3.2) | major.minor가 같은 `0.3.x` |
-| StarLight nightly (PluginCore 1.0.0) | `0.3.0` 이상, `1.0.0` 이하 |
+| StarLight 0.3.4b (PluginCore 0.3.2) | major.minor가 같은 `0.3.x` |
+| StarLight 1.0.0 (PluginCore 1.0.0) | `0.3.0` 이상, `1.0.0` 이하 |
 
-nightly에서는 앱보다 새로운 PluginCore를 요구하는 플러그인(`api_version`이 앱보다 높음)과, 지원 범위(`0.3.0`)보다 오래된 플러그인을 불러오지 않아요. Gradle 플러그인 0.3.0도 같은 범위로 검사해서, 벗어나면 경고를 보여 줘요.
+1.0.0에서는 앱보다 새로운 PluginCore를 요구하는 플러그인(`api_version`이 앱보다 높음)과, 지원 범위(`0.3.0`)보다 오래된 플러그인을 불러오지 않아요. Gradle 플러그인 0.3.0도 같은 범위로 검사해서, 벗어나면 경고를 보여 줘요.
 
 | 목표 | 권장 `api_version` |
 |---|---|
-| 정식 앱과 nightly 앱 모두 지원 | **`0.3.2`** |
-| nightly 앱(PluginCore 1.0.0) 전용 | `1.0.0` |
+| 0.3.4b와 1.0.0 모두 지원 | **`0.3.2`** |
+| 1.0.0(PluginCore 1.0.0) 전용 | `1.0.0` |
 
-`0.3.2`로 두더라도 PluginCore 1.0.0에서 추가된 API(위젯 DSL 등)를 쓴다면, 정식 앱에서는 그 부분이 `LinkageError`로 실패해요. [홈 위젯의 호환성](/docs/plugins/guides/widgets#호환성)처럼 감싸서 등록하세요.
+`0.3.2`로 두더라도 PluginCore 1.0.0에서 추가된 API(위젯 DSL 등)를 쓴다면, 0.3.4b에서는 그 부분이 `LinkageError`로 실패해요. [홈 위젯의 호환성](/docs/plugins/guides/widgets#호환성)처럼 감싸서 등록하세요.
 
 ## Gradle에서 생성하기
 
