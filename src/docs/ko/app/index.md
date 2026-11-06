@@ -17,7 +17,7 @@ export function onMessage(event) {
 ```
 
 > [!IMPORTANT]
-> 이 문서는 **스냅샷 채널(StarLight 1.0.0 개발 빌드)** 을 기준으로 해요. 베타(0.3.4b)와 정식 채널의 앱에는 NeonJS가 없고, 일부 화면과 기능이 이 문서와 다를 수 있어요. [다운로드](/#download)에서 스냅샷 채널을 고르면 같은 앱을 받을 수 있어요.
+> 이 문서는 **스냅샷 채널(StarLight 1.0.0 개발 빌드)** 을 기준으로 해요. Google Play 판과 베타 채널의 1.0.0-261103에는 [API 방식](/docs/app/guides/projects#api-방식)과 [받을 이벤트](/docs/app/guides/projects#받을-이벤트) 선택기가 없어요. 정식 채널(0.3.2a)에는 NeonJS가 없고, 화면과 기능이 많이 달라요. [다운로드](/#download)에서 스냅샷 채널을 고르면 같은 앱을 받을 수 있어요.
 
 ## 알아 둘 말
 
