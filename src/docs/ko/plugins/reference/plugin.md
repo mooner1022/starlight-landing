@@ -19,7 +19,7 @@ abstract class StarlightPlugin : Plugin, EventListener
 | 메서드 | 호출 시점 |
 |---|---|
 | `onEnable()` | 플러그인이 켜질 때예요. API, 이벤트, 위젯 등록과 구독을 여기서 해요. |
-| `onDisable()` | 플러그인이 꺼질 때예요. `onEnable()`에서 시작한 스레드, 코루틴, 리소스를 정리해요. |
+| `onDisable()` | 플러그인이 꺼질 때예요(플러그인 다시 불러오기, 앱 세션 종료). `onEnable()`에서 시작한 스레드, 코루틴, 리소스를 정리해요. |
 | `onNetworkStateChanged(state: Int)` | 기기의 네트워크 상태가 바뀔 때예요. `NetworkUtil.NETWORK_STATUS_NOT_CONNECTED`(0), `_WIFI`(1), `_MOBILE`(2), `_ETHERNET`(3) 중 하나가 들어와요. |
 | `onSchemeAction(context, isGlobal, params)` | `starlight://action/<플러그인 ID>?키=값` 링크가 열릴 때예요. 플러그인 ID 자리에 `global`을 쓰면 모든 플러그인이 받고, 이때 `isGlobal`이 `true`예요. |
 | `onProjectCreated(project)` / `onProjectRemoved(project)` / `onProjectUpdated(project)` | 인터페이스에는 있지만 **현재 앱은 플러그인에 이 콜백을 호출하지 않아요.** 대신 [`EventHandler.on<Events.Project.*>`](/docs/plugins/reference/events#프로젝트)를 쓰세요. |
@@ -30,7 +30,44 @@ abstract class StarlightPlugin : Plugin, EventListener
 protected fun addListener(listener: EventListener)
 ```
 
-다른 `EventListener` 객체도 같은 콜백을 받게 해요. 플러그인이 이미 켜져 있다면 `listener.onEnable()`이 바로 호출돼요. `getListeners()`는 플러그인 자신을 포함한 리스너 목록을 돌려줘요.
+다른 `EventListener` 객체도 같은 콜백을 받게 해요. `getListeners()`는 플러그인 자신을 포함한 리스너 목록을 돌려줘요.
+
+- 플러그인을 불러온 뒤에 추가하면 `listener.onEnable()`이 바로 호출돼요.
+- `onEnable()` 안에서 추가하면 플러그인 자신의 `onEnable` 다음에 호출돼요.
+
+PluginCore 1.0.x 앱에서는 두 경우 모두 리스너의 `onEnable`이 호출되지 않아요. 아래 [켜고 끄는 순서](#켜고-끄는-순서)를 참고하세요.
+
+### 켜고 끄는 순서
+
+**PluginCore 1.1.0 이상.** 플러그인을 불러올 때 `onEnable`은 이 순서로 호출돼요.
+
+1. 불러오기 전에 등록된 리스너
+2. 플러그인 자신
+3. 그사이 `onEnable()` 안에서 `addListener`로 추가된 리스너
+
+모든 `onEnable`이 끝나면 `isEnabled()`가 `true`가 돼요.
+
+- `onEnable`이 예외를 던지면 불러오기가 실패하고, `isEnabled()`는 `false`로 남아요.
+- 불러온 뒤 `setEnabled(true)`는 이미 켜져 있으므로 아무 일도 하지 않아요.
+- 언로드할 때(플러그인 다시 불러오기, 앱 세션 종료)는 `isEnabled()`를 `false`로 바꾸고, 모든 리스너와 플러그인 자신의 `onDisable`을 호출해요.
+- `onDisable`이 예외를 던지면 오류를 로그에 남기고, 나머지 리스너는 계속 비활성화해요.
+
+> [!WARNING]
+> `onDisable`은 `onEnable`이 실행되지 않은 리스너에도 호출될 수 있어요. 예를 들어 불러오는 중에 앞쪽 리스너의 `onEnable`이 실패해도 플러그인은 플러그인 목록에 남고, 그 뒤 언로드할 때 모든 리스너가 `onDisable`을 받아요. `onDisable`은 초기화되지 않은 상태(`lateinit`, 아직 등록하지 않은 리시버 등)를 견디게 작성하세요.
+
+PluginCore 1.0.x 앱에서는 이렇게 달라요.
+
+| 시점 | 1.0.x | 1.1.0 |
+|---|---|---|
+| 불러온 직후 `isEnabled()` | `false` (불러온 플러그인도 꺼진 것으로 보고) | `true` |
+| `onEnable()` 안에서 추가한 리스너 | `onEnable`이 호출되지 않음 | 플러그인 자신 다음에 `onEnable` 호출 |
+| 불러온 뒤 `addListener` | `onEnable`이 호출되지 않음 | 바로 `onEnable` 호출 |
+| 불러온 뒤 `setEnabled(true)` | 플러그인 `onEnable`이 다시 호출됨 | 아무 일도 하지 않음 |
+| 언로드할 때 | 플러그인 자신의 `onDisable`만 호출 | 모든 리스너와 플러그인 자신의 `onDisable` 호출 |
+
+- `onEnable()` 안에서 추가한 리스너의 `onEnable`이 호출되지 않는 문제를 직접 우회했다면(예: `listener.onEnable()`을 직접 호출) 우회 코드를 지우세요. 1.1.0에서는 두 번 호출돼요.
+- 언로드할 때 그동안 호출되지 않던 리스너 `onDisable`도 이제 호출돼요. 정리 코드가 그 상황에서 안전한지 확인하세요.
+- 생명주기는 앱의 PluginCore 버전을 따라요. 1.0.x 앱도 지원한다면 두 방식 모두에서 문제없도록 작성하세요.
 
 ## 설정
 
@@ -63,7 +100,7 @@ protected fun addListener(listener: EventListener)
 |---|---|
 | `info: PluginInfo` | `starlight.json`의 내용이에요. `info.id`, `info.name`, `info.version`, `info.fullName`(`"이름 v버전"`) 등이 있어요. |
 | `context: PluginContext` | 플러그인 ID, 이름, 리소스 폴더 경로(`resourceDir`)를 담고 있어요. 위젯과 언어를 등록할 때 내부적으로 써요. |
-| `isEnabled(): Boolean` | 플러그인이 켜져 있는지 알려 줘요. |
+| `isEnabled(): Boolean` | 플러그인이 켜져 있는지 알려 줘요. PluginCore 1.1.0부터는 모든 `onEnable`이 끝난 뒤 `true`가 돼요(1.0.x에서는 불러온 플러그인도 `false`). |
 | `getExternalDataDirectory(): File` | `/sdcard/StarLight/plugins/<이름>(<id>)/`예요. 사용자가 볼 수 있는 파일, 설정 파일(`config-plugin.json`)이 여기 있어요. |
 | `getInternalDataDirectory(): File` | 앱 내부 저장소의 `plugin_data/<id>/`예요. 사용자에게 보이지 않는 데이터를 둘 때 써요. |
 | `getAsset(path: String): File` | 플러그인 assets에서 풀린 파일이에요. assets를 바꿨다면 `starlight.json`의 `assetRevision`을 올려야 다시 풀려요. |
@@ -96,12 +133,47 @@ protected fun addListener(listener: EventListener)
 |---|---|
 | `id`, `name`, `fileExtension` | 언어 ID, 표시 이름, 스크립트 파일 확장자예요. |
 | `requireRelease` | `true`면 이벤트 함수를 호출할 때마다, 그리고 스코프를 정리하기 전에 `release(scope)`를 불러요. 스레드에 묶인 실행 컨텍스트를 정리해야 하는 엔진에 써요. |
-| `compile(code, apis, project, classLoader): Any` | 스크립트를 컴파일하고 스코프를 돌려줘요. `apis`(등록된 [API](/docs/plugins/guides/script-api) 목록)를 스크립트에 넣어 주는 것도 언어의 몫이에요. |
+| `compile(code, apis, project, classLoader): Any` | 스크립트를 컴파일하고 스코프를 돌려줘요. `apis`(등록된 [API](/docs/plugins/guides/script-api) 목록)를 스크립트에 넣어 주는 것도 언어의 몫이에요. 같은 프로젝트의 컴파일은 한 번에 하나만 실행되므로, 이 안에서 같은 프로젝트를 다시 컴파일하지 마세요. 이 메서드가 끝나지 않으면(무한 루프 등) 그 프로젝트의 다음 컴파일은 모두 60초 뒤 실패하고, 앱을 다시 시작해야 풀려요. → [컴파일은 한 번에 하나](/docs/plugins/reference/projects#컴파일은-한-번에-하나) |
 | `callFunction(scope, functionName, args): Any?` | 컴파일된 스코프에서 이벤트 함수를 불러요. |
 | `eval(code, options): Any` | 코드 한 조각을 실행해요(디버그룸 등). |
 | `release(scope)`, `destroy(scope)` | 스코프를 풀고 정리해요. |
 | `configStructure` | 언어별 설정 화면이에요. 값은 `getLanguageConfig()`로 읽어요. |
 | `defaultCode`, `codeGenerator` | 새 프로젝트의 기본 코드와 이벤트 함수 틀을 만드는 코드 생성기예요. |
+| `formatDefaultCode(…)` | 새 프로젝트의 시작 코드를 만들어요. 아래 [새 프로젝트 시작 코드](#새-프로젝트-시작-코드)를 참고하세요. |
 | `defaultConcurrency` | 프로젝트의 기본 동시 실행 수예요(기본 3). |
 
 언어 아이콘은 언어 assets의 `icon.png`를 써요. 실제 구현은 StarLight 저장소의 `JSRhino.kt`, `JSNeon.kt`를 참고하세요.
+
+### 새 프로젝트 시작 코드
+
+PluginCore 1.1.0에서 `formatDefaultCode`에 `received` 매개변수를 받는 오버로드가 추가됐어요. **PluginCore 1.1.0 이상**
+
+```kotlin
+// 기존: 기본 구현이 아래 3인자 형식을 (fileName, events, events)로 호출해요.
+open fun formatDefaultCode(fileName: String, events: List<ProjectEvent>): String
+
+// 추가
+open fun formatDefaultCode(fileName: String, events: List<ProjectEvent>, received: Collection<ProjectEvent>): String
+```
+
+`events`는 시작 코드를 만들 이벤트이고, `received`는 새 프로젝트가 받는 모든 이벤트로 시작 코드가 없는 이벤트도 포함해요. `starlight.*` 같은 와일드카드로 받는 이벤트 중에는 시작 코드는 없어도 StarLight가 함수 이름으로 호출하는 이벤트가 있어요. 리스너 함수가 그 이름을 쓰면 안 되므로, 이런 이벤트까지 알아야 [대체 함수 이름](/docs/plugins/guides/project-events#함수-이름이-겹칠-때)을 정할 수 있어요.
+
+StarLight가 어느 오버로드를 부르는지는 언어가 무엇을 오버라이드했는지에 따라 달라요.
+
+| 오버라이드한 것 | 새 프로젝트를 만들 때 | 편집기에서 없는 파일을 열 때(`events`가 비어 있음) |
+|---|---|---|
+| 없음 | 기본 3인자 | 기본 2인자 → 기본 3인자 |
+| 2인자만 | **2인자** (기존 언어 호환) | 2인자 |
+| 3인자만 | 3인자 | 기본 2인자 → 오버라이드한 3인자 |
+| 둘 다 | 3인자 | 2인자 |
+
+- 2인자만 오버라이드한 기존 언어는 그대로 동작해요. 그 안에서 `super.formatDefaultCode(fileName, events)`를 불러도 무한 재귀가 생기지 않아요.
+- **새로 작성하거나 고친다면 3인자 형식만 오버라이드하세요.** 두 경로가 같은 코드를 만들어요.
+- 3인자 형식을 직접 구현한다면 `ProjectEvent.alternateFunctionName` 규칙도 직접 처리해야 해요. 가능하면 `super`를 호출하세요.
+- PluginCore 1.0.x 앱은 3인자 형식을 호출하지 않아요. 오류는 나지 않지만 기본 시작 코드가 쓰여요.
+
+기본 구현은 함수 이름을 이렇게 정해요.
+
+- `events`와 `received` 중 대체 이름이 없는 이벤트들의 함수 이름은 고정 이름으로 봐요.
+- 대체 이름이 있는 이벤트의 함수 이름이 고정 이름과 겹치면, 그 이벤트는 대체 이름을 써요.
+- 대체 이름이 없는 이벤트끼리 이름이 겹치면, 이전처럼 두 번째 것부터 주석 처리해요.

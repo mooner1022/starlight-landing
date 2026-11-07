@@ -1,7 +1,7 @@
 ---
 title: 홈 위젯 만들기
 description: 위젯 DSL로 StarLight 홈 화면에 놓을 위젯을 만들어요.
-order: 4
+order: 5
 ---
 
 > [!IMPORTANT]

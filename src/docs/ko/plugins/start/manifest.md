@@ -31,7 +31,8 @@ order: 3
 | `name` | 문자열 | ✓ | 앱에 표시되는 이름이에요. |
 | `main_class` | 문자열 | ✓ | `StarlightPlugin`을 상속한 클래스의 전체 이름이에요. |
 | `version` | 버전 | ✓ | 플러그인 버전이에요. |
-| `api_version` | 버전 | ✓ | 플러그인이 기준으로 삼은 PluginCore 버전이에요. 앱의 PluginCore가 이 버전 이상이어야 불러와요. [API 버전 호환](#api-버전-호환)을 참고하세요. |
+| `api_version` | 버전 | ✓ | 플러그인에 필요한 가장 낮은 PluginCore 버전이에요. 앱의 PluginCore가 이 버전 이상이어야 불러와요. [API 버전 호환](#api-버전-호환)을 참고하세요. |
+| `target_api_version` | 버전 | | 빌드에 쓴 PluginCore 버전이에요. Gradle 플러그인 0.4.0이 자동으로 기록하고, 직접 써도 돼요(`api_version`보다 낮으면 경고). 지금 앱은 이 값을 읽지 않아요(모르는 키는 무시). 앞으로 동작 변경을 플러그인별로 나눠 적용할 때 쓰여요. |
 | `authors` | 문자열 배열 | ✓ | 만든 사람 목록이에요. |
 | `description` | 문자열 | ✓ | 플러그인 설명이에요. |
 | `dependency` | 문자열 배열 | | 먼저 불러와야 하는 플러그인 목록이에요. [의존성](#의존성)을 참고하세요. |
@@ -47,7 +48,7 @@ order: 3
 - 파일은 `assets/`에 두세요. `res/raw/`도 아직 읽지만 더 이상 권장하지 않아요.
 - UTF-8 BOM이 없어야 해요.
 - 의존성 키는 `dependency`예요. 예전 이름인 `depend`는 무시되므로 Gradle 플러그인이 오류로 알려 줘요.
-- **`api_version`이 `0.3.x`라면** `{`로 시작해 `}`로 끝나야 하고, 앞뒤에 공백이나 빈 줄이 있으면 안 돼요. 이런 플러그인은 PluginCore 0.3.x 앱(정식 앱)도 불러오는데, 그 앱은 파일을 줄 단위로 읽어 다시 합치기 때문이에요. PluginCore 1.0.0 앱은 파일을 그대로 JSON으로 읽어서 이 제한이 없어요.
+- **`api_version`이 `0.3.x`라면** `{`로 시작해 `}`로 끝나야 하고, 앞뒤에 공백이나 빈 줄이 있으면 안 돼요. 이런 플러그인은 PluginCore 0.3.x 앱(StarLight 0.3.4b)도 불러오는데, 그 앱은 파일을 줄 단위로 읽어 다시 합치기 때문이에요. PluginCore 1.0.0 이상 앱은 파일을 그대로 JSON으로 읽어서 이 제한이 없어요.
 
 ## 의존성
 
@@ -66,21 +67,39 @@ order: 3
 
 ## API 버전 호환
 
-`api_version`은 플러그인이 어떤 PluginCore를 기준으로 만들어졌는지, 즉 앱에 어느 버전 이상의 PluginCore가 필요한지 알려 줘요.
+`api_version`은 플러그인에 필요한 가장 낮은 PluginCore 버전이에요. 앱은 플러그인을 불러올 때 이 값을 앱의 PluginCore 버전과 비교해요.
 
 | 앱 | 받아들이는 `api_version` |
 |---|---|
 | StarLight 0.3.4b (PluginCore 0.3.2) | major.minor가 같은 `0.3.x` |
-| StarLight 1.0.0 (PluginCore 1.0.0) | `0.3.0` 이상, `1.0.0` 이하 |
+| StarLight 1.0.x (PluginCore 1.0.x, 현재 정식·베타는 1.0.1) | `0.3.0` 이상, 앱의 PluginCore 이하 |
+| StarLight 1.1.0 nightly (PluginCore 1.1.0) | `0.3.0` 이상, `1.1.0` 이하 |
 
-1.0.0에서는 앱보다 새로운 PluginCore를 요구하는 플러그인(`api_version`이 앱보다 높음)과, 지원 범위(`0.3.0`)보다 오래된 플러그인을 불러오지 않아요. Gradle 플러그인 0.3.0도 같은 범위로 검사해서, 벗어나면 경고를 보여 줘요.
+PluginCore 1.0.0 이상 앱은 `api_version`이 앱의 PluginCore보다 높은 플러그인을 건너뛰고, 로그에 "PluginCore 1.1.0 이상이 필요해요" 같은 이유를 남겨요. 지원 하한(`0.3.0`)보다 낮은 플러그인도 건너뛰어요.
 
 | 목표 | 권장 `api_version` |
 |---|---|
-| 0.3.4b와 1.0.0 모두 지원 | **`0.3.2`** |
-| 1.0.0(PluginCore 1.0.0) 전용 | `1.0.0` |
+| StarLight 0.3.4b(PluginCore 0.3.2) 앱까지 지원 | **`0.3.2`** |
+| PluginCore 1.0.0 이상 앱 지원 | `1.0.0` |
+| PluginCore 1.1.0 API를 쓰는 1.1.0 앱 전용 | `1.1.0` |
 
-`0.3.2`로 두더라도 PluginCore 1.0.0에서 추가된 API(위젯 DSL 등)를 쓴다면, 0.3.4b에서는 그 부분이 `LinkageError`로 실패해요. [홈 위젯의 호환성](/docs/plugins/guides/widgets#호환성)처럼 감싸서 등록하세요.
+`0.3.2`로 두더라도 PluginCore 1.0.0에서 추가된 API(위젯 DSL 등)를 쓴다면, PluginCore 0.3.2 앱에서는 그 부분이 `LinkageError`로 실패해요. [홈 위젯의 호환성](/docs/plugins/guides/widgets#호환성)처럼 감싸서 등록하세요.
+
+### PluginCore 1.1.0과 1.0.x
+
+| 플러그인 | PluginCore 1.0.x 앱 | PluginCore 1.1.0 앱 |
+|---|---|---|
+| 1.0.x용 기존 플러그인(`api_version` 1.0.x) | 그대로 동작 | 수정 없이 로드. [1.1.0의 동작 변경](/docs/plugins/sdk#1.1.0)이 적용됨 |
+| 1.1.0 API를 쓰고 `api_version`을 `1.1.0`으로 선언 | **로드되지 않음** | 동작 |
+| 1.1.0으로 빌드했지만 `api_version`은 1.0.x로 둠 | 아래 규칙을 지키면 동작 | 동작 |
+
+마지막 경우처럼 1.0.x 앱도 함께 지원하려면 다음을 지키세요.
+
+- **새 `open` 멤버는 오버라이드만 하세요. 안전해요.** 대상은 `scriptArguments`, `listenerName`, `alternateFunctionName`, `generateCode(generator, name)`, 3인자 `formatDefaultCode`예요. 1.0.x 앱에서는 호출되지 않을 뿐 오류는 나지 않아요.
+- **새 멤버를 직접 호출하지 마세요.** 플러그인 코드가 직접 호출하면 1.0.x 앱에서 `NoSuchMethodError`가 나요. 예: `ProjectInfoBuilder.allowedEventIds` 설정, `event.scriptArguments` 읽기. 꼭 써야 한다면 버전을 확인한 뒤에만 쓰고, 그 코드에 [`@RequiresPluginCore`](/docs/plugins/start/build-and-deploy#requiresplugincore)를 붙이세요.
+- 생명주기와 컴파일 동작은 앱 버전을 따라요. 두 방식 모두에서 문제없도록 작성하세요. → [켜고 끄는 순서](/docs/plugins/reference/plugin#켜고-끄는-순서), [컴파일은 한 번에 하나](/docs/plugins/reference/projects#컴파일은-한-번에-하나)
+
+Gradle 플러그인 0.4.0 이상과 PluginCore 1.1.0 AAR로 빌드하면 이 규칙을 빌드 단계에서 자동으로 확인해요. → [`api_version` 계산과 검증](/docs/plugins/start/build-and-deploy#api_version-계산과-검증)
 
 ## Gradle에서 생성하기
 
@@ -109,3 +128,5 @@ starlight {
 `manifest { }`가 없으면 `src/main/assets/starlight.json`을 검증해요. 직접 쓴 파일을 쓴다면 assets를 바꿀 때 `assetRevision`도 직접 올려 주세요.
 
 `category` 설정은 Gradle 플러그인 **0.3.0 이상**에서 쓸 수 있어요.
+
+Gradle 플러그인 **0.4.0 이상**에서는 `apiVersion`을 생략할 수 있어요. 생략하면 코드가 실제로 쓰는 PluginCore API로 계산하고, 적으면 그 값이 코드에 충분한지 검사해요. 빌드에 쓴 PluginCore 버전은 `target_api_version`으로 기록해요. 자세한 내용은 [`api_version` 계산과 검증](/docs/plugins/start/build-and-deploy#api_version-계산과-검증)을 참고하세요.

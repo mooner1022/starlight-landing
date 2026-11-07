@@ -1,7 +1,7 @@
 ---
 title: 설정 화면 만들기
 description: ConfigDSL로 플러그인 설정 화면을 정의하고, 저장된 값을 읽고, 변경에 반응해요.
-order: 3
+order: 4
 ---
 
 플러그인이 `getConfigStructure()`를 재정의하면 앱의 플러그인 목록에서 설정 화면을 열 수 있어요. 화면은 **ConfigDSL**로 정의하고, 값은 StarLight가 저장해 줘요.
