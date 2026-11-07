@@ -45,7 +45,7 @@ Android Studio에서 **No Activity** 템플릿으로 새 프로젝트를 만들�
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("io.github.mooner1022.slplugin") version "0.3.0"
+    id("io.github.mooner1022.slplugin") version "0.4.0"
 }
 
 android {
@@ -70,6 +70,9 @@ starlight {
 ```
 
 `sdk { }`에 지정한 두 파일은 자동으로 `compileOnly` 의존성이 돼요.
+
+> [!IMPORTANT]
+> PluginCore 1.1.0으로 개발한다면 **Gradle 플러그인 0.4.0 이상을 쓰세요.** 1.1.0에서 매니페스트 메타데이터와 버전 처리가 여러 가지 바뀌었고, 0.4.0이 이를 반영해요. 0.4.0은 코드가 쓰는 PluginCore API로 `api_version`을 계산하고 검증하며, `target_api_version`을 기록해요. 0.3.x는 `api_version` `1.1.0`을 모르는 값으로 보고 경고하고, 코드가 선언보다 새로운 API를 써도 잡지 못해요. → [`api_version` 계산과 검증](/docs/plugins/start/build-and-deploy#api_version-계산과-검증)
 
 > [!WARNING]
 > AGP 9의 내장 Kotlin을 쓴다면 루트 `build.gradle.kts`에 `id("org.jetbrains.kotlin.android") version "2.4.20" apply false`를 추가해 Kotlin 버전을 고정하세요.

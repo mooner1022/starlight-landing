@@ -16,6 +16,7 @@ order: 4
 | `restartStarlight` | StarLight를 강제 종료하고 다시 실행해요. |
 | `starlightLogcat` | StarLight의 로그캣을 스트리밍해요(Ctrl+C로 종료). |
 | `generate<Variant>StarlightManifest` | `starlight.json`을 생성해요(`manifest { }` 블록이 있을 때만). |
+| `scan<Variant>StarlightApiUsage` | 코드가 쓰는 PluginCore API를 찾아 `api_version`을 계산하고 검증해요. `assemble<Variant>Slp`의 일부로 실행돼요. **0.4.0+** → [`api_version` 계산과 검증](#api_version-계산과-검증) |
 | `verifyStarlightSdk` | SDK 파일이 있는지 확인해요(매 빌드 전에 실행돼요). |
 
 평소에는 이렇게 반복하면 돼요.
@@ -44,12 +45,13 @@ starlight {
 
 ## 검사 항목
 
-검사 규칙은 StarLight가 플러그인을 읽고 불러오는 방식과 같아요(Gradle 플러그인 0.3.0 기준).
+검사 규칙은 StarLight가 플러그인을 읽고 불러오는 방식과 같아요(Gradle 플러그인 0.4.0 기준).
 
 - `starlight.json`이 `assets/`에 있고 BOM이 없는지. `api_version`이 `0.3.x`라면 `{`로 시작해 `}`로 끝나고 앞뒤에 빈 줄이 없는지도 확인해요.
 - 필수 키(`id`, `name`, `main_class`, `version`, `api_version`, `authors`, `description`)와 그 형식
 - 버전이 `major.minor.patch[.build]` 형식인지
-- `api_version`이 앱이 불러오는 범위(`0.3.0` 이상, 앱의 PluginCore 이하)인지. Gradle 플러그인이 아는 가장 새 PluginCore는 1.0.0이라, 더 높은 값은 경고만 해요.
+- `api_version`이 앱이 불러오는 범위(`0.3.0` 이상, 빌드에 쓰는 PluginCore 이하)인지. 빌드에 쓰는 PluginCore를 AAR에서 알 수 없으면 1.1.0으로 보고, 더 높은 값은 경고만 해요. (0.3.x는 1.0.0까지만 알아서 `1.1.0`도 경고해요.)
+- `api_version`이 코드가 쓰는 PluginCore API보다 낮지 않은지(오류), `target_api_version`이 `api_version` 이상인지 → [`api_version` 계산과 검증](#api_version-계산과-검증)
 - `id`가 영문, 숫자, `.`, `_`, `-`로만 이루어졌고 예약어(`global`, `starlight`, `system`, `core`)가 아닌지(오류)
 - `category`가 문자열인지, 알려진 카테고리인지(모르는 값은 경고)
 - 의존성 문자열 형식(`id`, `id@1.2.3`, `id@*?`)과 `?`만 붙은 선택 의존성
@@ -57,6 +59,64 @@ starlight {
 - `main_class`가 APK 안에 있고, public이고, 추상 클래스가 아니며, `StarlightPlugin`을 상속하고, 인자 없는 public 생성자가 있는지
 - `uses_native_lib`가 실제 `.so` 파일 포함 여부와 맞는지
 - 앱이 제공하는 라이브러리(PluginCore, ConfigDSL, Kotlin, 주요 AndroidX, Material)를 플러그인에 넣었는지(경고)
+
+## `api_version` 계산과 검증
+
+**Gradle 플러그인 0.4.0 이상.** PluginCore 1.1.0 AAR로 빌드하면 Gradle 플러그인이 코드가 실제로 쓰는 PluginCore API로 `api_version`을 계산하고 검증해요. [1.0.x 앱도 함께 지원할 때의 규칙](/docs/plugins/start/manifest#plugincore-1.1.0과-1.0.x)을 빌드 단계에서 확인할 수 있어요.
+
+> [!IMPORTANT]
+> PluginCore 1.1.0으로 개발한다면 Gradle 플러그인 0.4.0 이상을 쓰는 것을 강력하게 권장해요. 1.1.0에서 매니페스트 메타데이터와 버전 처리가 여러 가지 바뀌었고, 0.3.x는 이를 반영하지 못해요. → [0.3.x에서 올리기](#0.3.x에서-올리기)
+
+SDK는 StarLight 저장소의 nightly 브랜치(기본 브랜치)에서 빌드하세요. 버전 표와 `@RequiresPluginCore`는 [StarLight#105](https://github.com/mooner1022/StarLight/pull/105)에서 들어왔고, 스냅샷 `1.1.0-261107`(versionCode 1000144)부터 앱에도 들어 있어요. 그보다 앞선 빌드의 AAR에는 버전 표가 없어서 계산할 수 없어요.
+
+- PluginCore 1.1.0 AAR에는 클래스와 멤버마다 추가된 버전을 기록한 표(`starlight/plugincore-api.json`)가 들어 있어요.
+- `scan<Variant>StarlightApiUsage` 태스크가 이 표와 플러그인 모듈의 컴파일된 클래스를 읽어, 코드가 쓰는 PluginCore API를 찾아요. 이 태스크는 `assemble<Variant>Slp`의 일부로 실행돼요.
+
+### 자동 계산
+
+`manifest { }` 블록에서 `apiVersion`을 생략하면, 코드가 실제로 쓰는 PluginCore API 중 가장 새로운 버전이 들어가요.
+
+- 새 API를 쓰지 않으면 표가 기록하는 가장 오래된 릴리스(`1.0.1`)가 들어가요. 1.0.1 이전 기록이 없으므로 이보다 낮게는 계산하지 않아요. PluginCore 1.0.0 앱까지 지원하려면 `apiVersion = "1.0.0"`을 직접 적으세요.
+- 계산에 넣는 것: 호출, 필드 읽기·쓰기, 메서드 참조, 상속·구현, 타입 사용(`new`, 형 변환, `instanceof`, 클래스 리터럴). 플러그인 자신의 하위 클래스를 거친 호출도 실제로 선언된 PluginCore 클래스까지 따라가 계산해요.
+- 계산에 넣지 않는 것: 새 멤버를 오버라이드만 한 것, 오버라이드 안에서 같은 메서드를 부르는 `super` 호출.
+
+### 선언값 검증
+
+- `apiVersion`을 적었거나 `starlight.json`을 직접 쓴 경우, 코드가 그보다 새로운 API를 쓰면 빌드가 실패해요. 오류 메시지(`'api_version' X is lower than PluginCore Y, which the code uses`)에 사용 위치(파일과 줄)와 API가 나와요.
+- 1.0.1에 이미 있던 API만 쓴다면 `0.3.2`, `1.0.0`처럼 1.0.1보다 낮게 적어도 오류가 아니에요. 다만 1.0.1 이전의 차이(예: 1.0.0에서 추가된 위젯 DSL)는 기록이 없어서 검사하지 못해요.
+- 반대로 선언값이 코드에 필요한 것보다 높으면, 오래된 앱에서 로드되지 않는다는 안내가 빌드 로그에 남아요. 새 버전의 동작에 의존한다면 의도한 것일 수 있으므로 오류는 아니에요.
+- 빌드에 쓴 PluginCore 버전이 매니페스트의 [`target_api_version`](/docs/plugins/start/manifest#키)에 자동으로 기록돼요.
+
+### `@RequiresPluginCore`
+
+새 API를 쓰면서 1.0.x 앱도 지원하려면, 버전을 먼저 확인하고 새 버전에서만 실행되는 코드에 `@RequiresPluginCore("1.1.0")`을 붙이세요. **PluginCore 1.1.0 이상**
+
+```kotlin
+override fun onEnable() {
+    if (Info.PLUGINCORE_VERSION >= Version(1, 1, 0))
+        createProject()
+}
+
+@RequiresPluginCore("1.1.0")
+private fun createProject() = Session.projectManager.newProject(events = starterEvents) {
+    name = "my-bot"
+    mainScript = "my-bot.js"
+    languageId = "js_neon"
+    allowedEventIds = setOf("myplugin.*")   // 1.1.0
+}
+```
+
+`dev.mooner.starlight.plugincore.RequiresPluginCore(version)`은 "이 코드는 PluginCore `version` 이상인 앱에서만 실행된다"고 표시하는 어노테이션이에요. 함수, 생성자, 클래스, 프로퍼티 getter·setter에 붙일 수 있어요. 클래스 파일에만 남고 런타임에 로드되지 않으므로, 이 어노테이션이 없는 1.0.x 앱에서도 플러그인이 정상적으로 로드돼요.
+
+- 표시된 코드 안에서 쓴 `version` 이하의 API는 계산에서 빠져요. Java·Kotlin 람다와 지역·익명 클래스도 그 코드의 일부로 봐요.
+- 다만 표시된 코드가 메서드 참조(`this::helper`)로만 가리키는 일반 메서드는 다른 곳에서 직접 호출될 수 있으므로 계속 계산에 들어가요. 그 메서드에도 따로 표시하세요.
+- 표시된 코드가 쓴 API가 어노테이션의 버전보다 새로우면 그 사용은 그대로 계산에 들어가요.
+- 버전 확인에는 모든 버전에 있는 `Info.PLUGINCORE_VERSION`과 `Version`을 쓰세요. 1.1.0에 새로 생긴 도우미로 확인하면 그 도우미가 옛 앱에 없어서 확인 자체가 실패해요.
+
+### 한계
+
+- 플러그인 모듈 자신의 클래스만 검사해요. 다른 모듈의 코드나 리플렉션 호출은 직접 표시해야 해요.
+- PluginCore 1.1.0 이전 AAR로 빌드하면 계산할 수 없으므로 `apiVersion`을 적어야 해요.
 
 ## 참고 사항
 
@@ -71,6 +131,23 @@ starlight {
 - **같은 ID의 파일** — `plugins/` 폴더에 ID가 같은 `.slp`가 여럿 있으면 StarLight는 `version`이 가장 높은 것을 불러오고 나머지는 제외해요. 배포 태스크는 `<id>.slp`로 저장하므로, 다른 이름으로 남아 있는 예전 파일은 지워 주세요.
 - **구성 캐시** — Gradle 플러그인 0.3.0은 Gradle 구성 캐시(configuration cache)와 함께 쓸 수 있어요.
 
+## 0.3.x에서 올리기
+
+PluginCore 1.1.0으로 개발한다면 0.4.0으로 올리는 것을 강력하게 권장해요. `plugins { }` 블록의 버전을 바꾸세요.
+
+```kotlin title="app/build.gradle.kts"
+plugins {
+    id("io.github.mooner1022.slplugin") version "0.4.0"
+}
+```
+
+0.4.0에서 바뀐 점이에요.
+
+- PluginCore 1.1.0 이상 AAR로 빌드하면, 코드가 `api_version`보다 새로운 PluginCore API를 쓸 때 빌드가 실패해요. `api_version`을 올리거나 그 코드를 [`@RequiresPluginCore`](#requiresplugincore)로 표시하세요.
+- `manifest { }` 블록에서 `apiVersion`을 생략할 수 있어요.
+- 생성한 매니페스트에 `target_api_version`이 들어가요. 직접 쓴 `starlight.json`에도 넣을 수 있어요.
+- `api_version`이 `1.1.0`이어도 더 이상 경고하지 않아요.
+
 ## 0.2.0에서 올리기
 
 - 플러그인 ID에 영문, 숫자, `.`, `_`, `-` 외의 문자가 있으면 이제 오류예요(이전에는 경고). PluginCore 1.0.0 앱이 이런 플러그인을 불러오지 않기 때문이에요.
@@ -83,7 +160,7 @@ starlight {
 
 | 로그 | 원인과 해결 |
 |---|---|
-| `requires PluginCore X or newer` | `api_version`이 앱의 PluginCore보다 높아요. 앱을 업데이트하거나 `api_version`을 낮추세요. |
+| `requires PluginCore X or newer` (한국어: `PluginCore X 이상이 필요해요`) | `api_version`이 앱의 PluginCore보다 높아요. 앱을 업데이트하거나 `api_version`을 낮추세요. 낮추기 전에 코드가 그 버전의 API를 쓰지 않는지 확인하세요. → [`api_version` 계산과 검증](#api_version-계산과-검증) |
 | `targets PluginCore X, older than the supported Y` | `api_version`이 지원 범위보다 오래됐어요. |
 | `Required dependency X for plugin Y wasn't found` | `dependency`에 적은 플러그인이 기기에 없거나 버전(major.minor)이 맞지 않아요. |
 | `Failed to read plugin info from …` | `starlight.json`을 읽지 못했어요. 뒤에 붙은 이유를 확인하세요. `Cannot find starlight.json`은 파일 위치, `Malformed starlight.json`은 JSON 문법이나 BOM, `Illegal plugin id`는 ID에 쓸 수 없는 문자가 있다는 뜻이에요. → [형식 규칙](/docs/plugins/start/manifest#파일-형식-규칙) |

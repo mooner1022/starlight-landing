@@ -34,7 +34,7 @@ class AlarmEvent : ProjectEvent() {
     // 새 프로젝트를 만들 때 함수 위에 붙는 주석이에요. (선택)
     override val functionComment: String = "알람이 울릴 때 호출돼요."
 
-    // 이벤트 목록에서 이름과 함께 보이는, 이벤트가 일어나는 때예요. (선택, PluginCore 1.0.0 이상)
+    // 이벤트 목록에서 이름과 함께 보이는, 이벤트가 일어나는 때예요. (선택, PluginCore 1.0.1 이상)
     override val description: String = translate {
         Locale.ENGLISH { "When an alarm goes off" }
         Locale.KOREAN  { "알람이 울릴 때" }
@@ -42,7 +42,7 @@ class AlarmEvent : ProjectEvent() {
 }
 ```
 
-프로젝트 설정의 **받을 이벤트** 목록은 이벤트마다 `usage`, `name`, `description`, 이벤트 ID를 보여 줘요. `usage`는 스크립트가 이벤트를 받는 방법이고, 기본값은 `onAlarm(time, label)`처럼 함수 이름과 인자예요. 함수가 아닌 다른 방법으로 전달하는 이벤트라면 `usage`를 바꾸고, `dispatch()`와 `generateCode()`를 재정의해 전달 방법과 새 프로젝트의 기본 코드를 정할 수 있어요.
+프로젝트 설정의 **받을 이벤트** 목록은 이벤트마다 `usage`, `name`, `description`, 이벤트 ID를 보여 줘요. `usage`는 스크립트가 이벤트를 받는 방법이고, 기본값은 `onAlarm(time, label)`처럼 함수 이름과 인자예요. 함수가 아닌 다른 방법으로 전달하는 이벤트라면 `usage`를 바꾸고, `dispatch()`와 `generateCode()`를 재정의해 전달 방법과 새 프로젝트의 기본 코드를 정할 수 있어요. → [선택 멤버](#선택-멤버)
 
 `typedAs`는 `ProjectEvent` 안에서 쓸 수 있는 중위 함수예요. `typedAs<String>("time")` 형태로도 쓸 수 있어요.
 
@@ -83,7 +83,71 @@ export function onAlarm(time, label) {
 }
 ```
 
-새 프로젝트를 만들 때 이벤트를 고르면 함수 틀과 `functionComment`가 기본 코드에 들어가요. 함수 이름이 같은 이벤트가 둘 이상이면 처음 것만 함수로 만들고 나머지는 주석 처리해요.
+새 프로젝트를 만들 때 이벤트를 고르면 함수 틀과 `functionComment`가 기본 코드에 들어가요. 함수 이름이 같은 이벤트가 둘 이상이면 처음 것만 함수로 만들고 나머지는 주석 처리해요. PluginCore 1.1.0부터는 [대체 함수 이름](#함수-이름이-겹칠-때)을 정해 주석 처리를 피할 수 있어요.
+
+## 선택 멤버
+
+아래 멤버는 모두 기본 구현이 있는 `open` 멤버라 오버라이드는 선택이에요. `description`과 `usage`는 프로젝트 설정의 받을 이벤트 목록에 보이고, [StarLight AI](/docs/plugins/guides/starlight-ai#이벤트)는 `description`, `usage`, `functionName`, `scriptArguments`, `listenerName`을 그대로 써요.
+
+| 멤버 | 기본값 | 언제 오버라이드하나 |
+|---|---|---|
+| `description: String?` **1.0.1+** | `null` | 이벤트가 언제 일어나는지 짧게 설명할 때. 받을 이벤트 목록에 보여요. |
+| `usage: String` **1.0.1+** | `functionName(인자, …)` | 스크립트가 이벤트를 받는 방법이 함수가 아닐 때. 예: `myBot.on("message")` |
+| `dispatch(project, args, onFailure)` **1.0.1+** | `functionName` 함수를 호출 | 스크립트가 등록한 리스너처럼 다른 방식으로 전달할 때 |
+| `generateCode(generator)` **1.0.1+** | `functionName` 함수 하나 | 시작 코드에 함수 말고도 필요한 코드(리스너 등록 등)가 있을 때 |
+| `scriptArguments: Array<CodeGenerator.Argument<*>>` **1.1.0+** | `argTypes` | `dispatch`가 스크립트에 넘기는 인자가 이벤트를 발생시킬 때의 인자(`argTypes`)와 다를 때. 예: 원본 대신 래퍼 객체를 넘기는 경우. StarLight AI는 이 값으로 스크립트가 받는 인자를 설명해요. |
+| `listenerName: String?` **1.1.0+** | `null` | 스크립트가 함수 이름 대신 리스너를 등록해 받는 이벤트일 때, 등록할 때 쓰는 이름. 예: `bot.on("message", …)`의 `"message"` |
+| `alternateFunctionName: String?` **1.1.0+** | `null` | 시작 코드의 함수 이름이 다른 이벤트의 함수 이름과 겹칠 수 있을 때 대신 쓸 이름. `null`이면 겹칠 때 주석 처리돼요. |
+| `generateCode(generator, name)` **1.1.0+** | `name`이 `functionName`이면 `generateCode(generator)`, 아니면 `name`으로 된 함수 하나 | `alternateFunctionName`을 정하면서 `generateCode(generator)`도 오버라이드했다면 **반드시 같이 오버라이드하세요.** 그러지 않으면 대체 이름일 때 리스너 등록 코드가 빠진 함수만 생겨요. |
+
+1.1.0 멤버는 오버라이드만 한다면 PluginCore 1.0.x 앱에서도 안전해요. 그 앱은 호출하지 않을 뿐 오류는 나지 않아요. 반대로 플러그인 코드가 `event.scriptArguments`처럼 직접 읽으면 1.0.x 앱에서 `NoSuchMethodError`가 나요.
+
+### 리스너로 받는 이벤트
+
+스크립트가 함수 이름 대신 리스너를 등록해 받는 이벤트의 예시예요.
+
+```kotlin title="MyMessageEvent.kt"
+class MyMessageEvent : ProjectEvent() {
+    override val id = "message"
+    override val name = "My 메시지 이벤트"
+    override val functionName = "onMessage"
+    override val argTypes: Array<CodeGenerator.Argument<*>> = arrayOf("message" typedAs Message::class)
+
+    // dispatch가 래퍼를 넘기므로, 스크립트가 실제로 받는 인자를 알려 줘요.
+    override val scriptArguments: Array<CodeGenerator.Argument<*>> = arrayOf("msg" typedAs MyMessage::class)
+    override val listenerName: String = "message"
+    override val usage: String get() = "myBot.on(\"message\")"
+
+    // StarLight의 onMessage와 겹치면 onMyMessage로 만들어요.
+    override val alternateFunctionName: String get() = "onMyMessage"
+
+    override fun generateCode(generator: CodeGenerator): CodeGenerator.GeneratedFunction =
+        generateCode(generator, functionName)
+
+    override fun generateCode(generator: CodeGenerator, name: String): CodeGenerator.GeneratedFunction =
+        CodeGenerator.GeneratedFunction(
+            imports = listOf("const myBot = MyBot.get();"),
+            function = "function $name(msg) {\n}\nmyBot.on(\"message\", $name);",
+        )
+
+    override fun dispatch(project: Project, args: Array<out Any>, onFailure: (Throwable) -> Unit) {
+        // 등록된 리스너에 MyMessage(args[0] as Message)를 전달
+    }
+}
+```
+
+> [!NOTE]
+> NeonJS는 `export`된 함수만 이름으로 호출해요. 그래서 위처럼 `export` 없이 직접 쓴 리스너 함수는 StarLight가 이름으로 다시 호출하지 않아요. 반면 언어의 `CodeGenerator`로 함수를 만들면 NeonJS에서는 `export`가 붙어, 같은 이름의 StarLight 이벤트가 그 함수를 한 번 더 불러요.
+
+### 함수 이름이 겹칠 때
+
+**PluginCore 1.1.0 이상.** 새 프로젝트의 시작 코드를 만들 때, 기본 구현은 함수 이름을 이렇게 정해요.
+
+- 새 프로젝트가 받는 이벤트 중 `alternateFunctionName`이 없는 이벤트들의 함수 이름은 고정 이름으로 봐요. 시작 코드가 없어도 `starlight.*` 같은 와일드카드로 받는 이벤트도 포함돼요.
+- `alternateFunctionName`이 있는 이벤트의 함수 이름이 고정 이름과 겹치면, 그 이벤트는 대체 이름을 써요.
+- `alternateFunctionName`이 없는 이벤트끼리 이름이 겹치면, 이전처럼 두 번째 것부터 주석 처리해요.
+
+위 예시의 `MyMessageEvent`를 StarLight의 메시지 이벤트(`onMessage`)와 함께 받는 프로젝트라면, 시작 코드에는 `onMyMessage`라는 리스너 함수가 만들어져요. 플러그인 언어가 이 규칙을 어떻게 받는지는 [새 프로젝트 시작 코드](/docs/plugins/reference/plugin#새-프로젝트-시작-코드)를 참고하세요.
 
 ## 이벤트 호출
 
@@ -139,4 +203,5 @@ if (project.isCompiled && project.isEventCallAllowed(eventId)) {
 ## 다음 단계
 
 - 이벤트 호출 시점을 앱 이벤트(프로젝트 컴파일, 메시지 수신 등)에 맞추려면 → [이벤트 레퍼런스](/docs/plugins/reference/events)
+- StarLight AI가 이벤트를 어떻게 설명하는지 → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
 - 실제 예제 → [웹 서버 플러그인 살펴보기](/docs/plugins/guides/webserver-example)

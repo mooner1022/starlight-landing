@@ -256,8 +256,8 @@ const ko = {
 		} satisfies Record<DocSection, string>,
 		sdk: {
 			title: '최신 SDK',
-			channel: 'StarLight 1.0.0',
-			channelNote: 'StarLight 1.0.0에 들어 있는 버전이에요. 이전 앱(0.3.4b)에는 PluginCore 0.3.2가 들어 있고, Google Play 판은 플러그인을 불러오지 않아요.',
+			channel: 'nightly',
+			channelNote: 'StarLight nightly 빌드 기준이에요. 1.1.0은 예비 사양이라 바뀔 수 있어요. 정식 앱(1.0.1)에는 PluginCore 1.0.1이 들어 있고, Google Play 판은 플러그인을 불러오지 않아요.',
 			preparing: '준비 중',
 			download: '내려받기',
 			plugincore: '플러그인 기본 클래스, 이벤트, 프로젝트, 위젯 API',
@@ -524,8 +524,8 @@ const en: Messages = {
 		},
 		sdk: {
 			title: 'Latest SDK',
-			channel: 'StarLight 1.0.0',
-			channelNote: 'The version in StarLight 1.0.0. The previous app (0.3.4b) ships PluginCore 0.3.2, and the Google Play build doesn’t load plugins.',
+			channel: 'nightly',
+			channelNote: 'Based on StarLight nightly builds. 1.1.0 is a preview and may still change. The released app (1.0.1) ships PluginCore 1.0.1, and the Google Play build doesn’t load plugins.',
 			preparing: 'Coming soon',
 			download: 'Download',
 			plugincore: 'Plugin base class, events, projects and widget APIs',
