@@ -1,11 +1,11 @@
 ---
 title: 홈 위젯 만들기
 description: 위젯 DSL로 StarLight 홈 화면에 놓을 위젯을 만들어요.
-order: 4
+order: 5
 ---
 
 > [!IMPORTANT]
-> 위젯 DSL은 **PluginCore 1.0.0 이상**에서 쓸 수 있어요. 정식 앱(0.3.4b)에서 실행하면 클래스를 찾지 못해 `LinkageError`가 발생하므로, 아래 [호환성](#호환성)처럼 감싸서 등록하세요.
+> 위젯 DSL은 **PluginCore 1.0.0 이상**에서 쓸 수 있어요. PluginCore 0.3.2 앱(StarLight 0.3.4b)에서 실행하면 클래스를 찾지 못해 `LinkageError`가 발생하므로, 아래 [호환성](#호환성)처럼 감싸서 등록하세요.
 
 ## 위젯 정의
 
@@ -90,7 +90,7 @@ override fun onEnable() {
 
 ## 호환성
 
-정식 앱(PluginCore 0.3.2)에도 플러그인을 배포한다면, 웹 서버 플러그인처럼 등록을 감싸 두세요. 위젯만 빠지고 나머지 기능은 계속 동작해요.
+PluginCore 0.3.2 앱(StarLight 0.3.4b)에도 플러그인을 배포한다면, 웹 서버 플러그인처럼 등록을 감싸 두세요. 위젯만 빠지고 나머지 기능은 계속 동작해요.
 
 ```kotlin
 try {

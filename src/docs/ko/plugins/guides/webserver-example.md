@@ -1,7 +1,7 @@
 ---
 title: 웹 서버 플러그인 살펴보기
 description: 실제 플러그인인 starlight-webserver가 API, 프로젝트 이벤트, 설정 화면, 위젯을 어떻게 엮는지 따라가 봐요.
-order: 5
+order: 6
 ---
 
 [starlight-webserver](https://github.com/mooner1022/starlight-webserver)(v0.1.2)는 프로젝트(스크립트)가 HTTP 요청을 처리하게 해 주는 플러그인이에요. Ktor(CIO 엔진) 위에서 동작하고, 홈 화면용 상태 위젯을 함께 제공해요. 앞의 가이드에서 다룬 기능을 모두 쓰기 때문에 전체 흐름을 보기에 좋아요.

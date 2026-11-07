@@ -62,7 +62,7 @@ starlight {
 `manifest { }` 대신 `src/main/assets/starlight.json`을 직접 써도 돼요. 이때는 Gradle 플러그인이 파일을 검증만 해요. 키와 규칙은 [starlight.json](/docs/plugins/start/manifest)에서 자세히 볼 수 있어요.
 
 > [!TIP]
-> 정식 앱(0.3.4b)에서도 동작해야 한다면 `apiVersion`을 `0.3.2`로 두세요. 정식 앱과 nightly 앱이 모두 이 플러그인을 불러와요. nightly 앱 전용이라면 `1.0.0`으로 둬도 돼요. 이유는 [API 버전 호환](/docs/plugins/start/manifest#api-버전-호환)에 정리해 두었어요.
+> `apiVersion`을 `0.3.2`로 두면 StarLight 0.3.4b부터 지금의 정식·베타 앱(1.0.1)과 nightly 앱(1.1.0)까지 모두 이 플러그인을 불러와요. PluginCore 1.0.0 이상 앱만 지원한다면 `1.0.0`으로 둬도 돼요. 이유는 [API 버전 호환](/docs/plugins/start/manifest#api-버전-호환)에 정리해 두었어요. Gradle 플러그인 0.4.0부터는 `apiVersion`을 생략하면 코드가 쓰는 API로 계산해요.
 
 ## 3. 빌드
 
