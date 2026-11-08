@@ -32,13 +32,14 @@ class HelloPlugin : StarlightPlugin() {
 | 홈 화면 위젯 추가 | `addWidget()` | [홈 위젯 만들기](/docs/plugins/guides/widgets) |
 | 메시지, 프로젝트, 알림 등 앱 이벤트에 반응 | `EventHandler.on<T>()` | [이벤트](/docs/plugins/reference/events) |
 | 새 스크립트 언어(엔진) 추가 | `addLanguage()` | [StarlightPlugin](/docs/plugins/reference/plugin#언어-추가) |
+| StarLight AI에 API 설명 제공 | KDoc + KSP, 가이드 | [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai) |
 
 ## 구성 요소
 
 - **StarLight 앱** — 플러그인을 불러오고 실행하는 호스트예요. 플러그인이 쓰는 Kotlin, 코루틴, AndroidX 같은 라이브러리도 앱이 제공해요.
 - **PluginCore** — 플러그인이 컴파일할 때 참조하는 SDK예요. `StarlightPlugin`, 이벤트, 프로젝트, 위젯 API가 들어 있어요.
 - **ConfigDSL** — 플러그인 설정 화면을 Kotlin DSL로 정의하는 라이브러리예요.
-- **[StarLight Gradle 플러그인](https://github.com/mooner1022/StarLight-GradlePlugin)** — `.slp` 패키징, `starlight.json` 생성과 검증, 기기 배포까지 맡는 Gradle 플러그인이에요.
+- **[StarLight Gradle 플러그인](https://github.com/mooner1022/StarLight-GradlePlugin)** — `.slp` 패키징, `starlight.json` 생성과 검증, StarLight AI용 문서 배포, 기기 배포까지 맡는 Gradle 플러그인이에요.
 
 PluginCore와 ConfigDSL은 [SDK 페이지](/docs/plugins/sdk)에서 버전별 변경 사항을 확인할 수 있어요. 기존 플러그인을 새 버전으로 올린다면 [버전 올리기](/docs/plugins/migration)를 보세요.
 

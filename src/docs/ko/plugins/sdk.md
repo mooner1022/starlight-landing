@@ -35,6 +35,8 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 | 새 API | [`ProjectEvent`의 새 멤버](/docs/plugins/guides/project-events#선택-멤버), [`ProjectInfoBuilder.allowedEventIds`](/docs/plugins/reference/projects#프로젝트-만들기), [`@RequiresPluginCore`](/docs/plugins/start/build-and-deploy#requiresplugincore) | 선택 |
 | 도구 | [Gradle 플러그인 0.4.0이 `api_version`을 코드에서 계산하고 검증](/docs/plugins/start/build-and-deploy#api_version-계산과-검증) | Gradle 플러그인 0.4.0으로 올리기(**강력 권장**) |
 | 새 기능 | [StarLight AI가 플러그인 API·이벤트를 보는 방식](/docs/plugins/guides/starlight-ai) | 이름과 패키지 구조 확인 |
+| 새 기능 | [플러그인 KDoc과 가이드를 StarLight AI에 배포](/docs/plugins/guides/starlight-ai#kdoc과-가이드-배포하기) | 선택: Gradle 플러그인 0.5.0과 KSP 적용, KDoc·가이드 작성 |
+| 도구 | [개발자 모드에서 StarLight AI가 읽는 문서 확인](/docs/plugins/guides/starlight-ai#개발자-모드에서-확인하기) | 선택: 플러그인 설치 후 확인 |
 | 참고 | [NeonJS 0.1.7과 스레드](/docs/plugins/guides/script-api#스크립트-콜백과-스레드) | 스크립트 콜백을 다른 스레드에서 부르는 API라면 확인 |
 
 **동작 변경**
@@ -53,10 +55,13 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 **도구**
 
 - [StarLight Gradle 플러그인 0.4.0](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기)이 나왔어요. 1.1.0에서 매니페스트 메타데이터와 버전 처리가 여러 가지 바뀌었으니, PluginCore 1.1.0으로 개발한다면 **0.4.0을 쓰는 것을 강력하게 권장해요.** 0.4.0은 코드가 쓰는 PluginCore API로 `api_version`을 계산하고 검증하며, `target_api_version`을 기록해요.
+- [Gradle 플러그인 0.5.0](/docs/plugins/start/build-and-deploy#0.4.x에서-올리기)은 KSP를 적용한 빌드에서 플러그인의 KDoc을 StarLight AI용 문서로 패키지에 넣어요. Java는 `-parameters`, Kotlin은 `-java-parameters`로 컴파일해서 문서가 없는 멤버도 매개변수 이름이 보여요.
 
 **StarLight AI**
 
 - StarLight AI가 앱에 들어 있던 문서 사본 대신 실행 중인 앱에 등록된 API와 이벤트에서 문서를 만들어요. 플러그인의 API와 이벤트도 함께 보여요. 별도 설정은 필요 없어요.
+- 플러그인 패키지의 KDoc(`starlight/agent/<플러그인 ID>.api.json`)과 가이드(`assets/agent/guides/`)를 읽어, 앱의 API와 같은 형식으로 설명을 붙여요. 가이드는 `read_guide`로 열어요.
+- **설정 → 개발자 모드 → StarLight AI 문서**에서 StarLight AI가 읽는 가이드, API, 이벤트, 타입 문서를 그대로 볼 수 있어요.
 - 스크립트가 쓰는 PluginCore 타입(`Project`, `ProjectInfo`, `StarlightPlugin`, `PluginInfo`, `Language`와 `chat`, `logger`, `library` 패키지)에 StarLight AI용 KDoc이 붙었어요. 플러그인용 멤버에는 `@suppress`가 붙어 스크립트 문서에서만 숨겨져요. API 자체는 바뀌지 않았어요.
 
 **그 밖의 변경**
@@ -66,9 +71,9 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 - `StarlightPlugin`의 내부 필드 `originalFile`이 스크립트에 보이지 않아요(`@JvmSynthetic`). 이전에는 스크립트에서 읽고 쓸 수 있었어요.
 
 > [!NOTE]
-> 스냅샷 `1.1.0-261107`(versionCode 1000144)부터 위 변경이 모두 들어 있어요. 같은 이름의 앞선 빌드(versionCode 1000142)에는 버전 표와 `@RequiresPluginCore`([#105](https://github.com/mooner1022/StarLight/pull/105))가 없어서, 그 시점의 AAR로는 Gradle 플러그인이 `api_version`을 계산할 수 없어요. 그 전 스냅샷 `1.0.1-261107`(versionCode 1000141)은 #104가 들어 있어도 PluginCore를 `1.0.1`로 보고해서 `api_version`이 `1.1.0`인 플러그인을 불러오지 않아요.
+> 스냅샷 `1.1.0-261108`(versionCode 1000147)부터 위 변경이 모두 들어 있어요. 플러그인의 KDoc·가이드를 읽는 기능과 개발자 모드의 문서 확인 화면([#106](https://github.com/mooner1022/StarLight/pull/106))은 이 빌드부터예요. 스냅샷 `1.1.0-261107`(versionCode 1000144)에는 그 밖의 변경이 들어 있고, 같은 이름의 앞선 빌드(versionCode 1000142)에는 버전 표와 `@RequiresPluginCore`([#105](https://github.com/mooner1022/StarLight/pull/105))가 없어서, 그 시점의 AAR로는 Gradle 플러그인이 `api_version`을 계산할 수 없어요. 그 전 스냅샷 `1.0.1-261107`(versionCode 1000141)은 #104가 들어 있어도 PluginCore를 `1.0.1`로 보고해서 `api_version`이 `1.1.0`인 플러그인을 불러오지 않아요.
 
-원본: [StarLight#104](https://github.com/mooner1022/StarLight/pull/104), [StarLight#105](https://github.com/mooner1022/StarLight/pull/105), [StarLight-GradlePlugin#4](https://github.com/mooner1022/StarLight-GradlePlugin/pull/4)
+원본: [StarLight#104](https://github.com/mooner1022/StarLight/pull/104), [StarLight#105](https://github.com/mooner1022/StarLight/pull/105), [StarLight#106](https://github.com/mooner1022/StarLight/pull/106), [StarLight-GradlePlugin#4](https://github.com/mooner1022/StarLight-GradlePlugin/pull/4), [StarLight-GradlePlugin#5](https://github.com/mooner1022/StarLight-GradlePlugin/pull/5)
 
 ### 1.0.1
 
