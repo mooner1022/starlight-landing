@@ -28,7 +28,7 @@ order: 2
 
 ### 꼭 확인할 것
 
-- **Gradle 플러그인을 0.4.0으로 올리세요(강력 권장).** 1.1.0에서 매니페스트 메타데이터와 버전 처리가 여러 가지 바뀌었고, 0.3.x는 이를 반영하지 못해요. 0.4.0은 코드가 쓰는 PluginCore API로 `api_version`을 계산하고 검증해요. 코드가 1.1.0 API를 쓰는데 적어 둔 `api_version`이 그보다 낮으면 빌드가 실패하니, `api_version`을 올리거나 그 코드를 [`@RequiresPluginCore`](/docs/plugins/start/build-and-deploy#requiresplugincore)로 표시하세요. → [0.3.x에서 올리기](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기)
+- **Gradle 플러그인을 0.4.0 이상(지금은 0.5.0)으로 올리세요(강력 권장).** 1.1.0에서 매니페스트 메타데이터와 버전 처리가 여러 가지 바뀌었고, 0.3.x는 이를 반영하지 못해요. 0.4.0은 코드가 쓰는 PluginCore API로 `api_version`을 계산하고 검증해요. 코드가 1.1.0 API를 쓰는데 적어 둔 `api_version`이 그보다 낮으면 빌드가 실패하니, `api_version`을 올리거나 그 코드를 [`@RequiresPluginCore`](/docs/plugins/start/build-and-deploy#requiresplugincore)로 표시하세요. → [0.3.x에서 올리기](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기)
 - **리스너의 생명주기.** 로드가 끝나면 `isEnabled()`가 `true`가 되고, `onEnable()` 안에서 추가한 리스너도 `onEnable`을 받아요. 언로드할 때는 모든 리스너가 `onDisable`을 받아요. → [켜고 끄는 순서](/docs/plugins/reference/plugin#켜고-끄는-순서)
   - `listener.onEnable()`을 직접 부르던 우회 코드는 지우세요. 1.1.0에서는 두 번 호출돼요.
   - `onDisable`은 `onEnable`이 실행되지 않은 리스너에도 호출될 수 있어요. `lateinit`이나 아직 등록하지 않은 리시버를 건드리기 전에 초기화됐는지 확인하세요.
@@ -43,7 +43,9 @@ order: 2
 - **리스너로 받는 이벤트**나 래퍼 객체를 넘기는 이벤트라면 `scriptArguments`, `listenerName`을 정하세요. StarLight AI가 이 값으로 이벤트를 설명해요. → [선택 멤버](/docs/plugins/guides/project-events#선택-멤버)
 - **시작 코드의 함수 이름이 StarLight 이벤트와 겹칠 수 있다면** `alternateFunctionName`을 정하세요. `generateCode(generator)`를 오버라이드했다면 `generateCode(generator, name)`도 반드시 함께 오버라이드하세요. → [함수 이름이 겹칠 때](/docs/plugins/guides/project-events#함수-이름이-겹칠-때)
 - **프로젝트를 만드는 플러그인**이라면 `allowedEventIds`로 받을 이벤트를 처음부터 정할 수 있어요. → [프로젝트 만들기](/docs/plugins/reference/projects#프로젝트-만들기)
-- **StarLight AI가 API를 잘 설명하게 하려면** 이벤트의 `description`, `usage`를 짧고 정확하게 쓰고, 스크립트가 받는 타입을 API 클래스와 같은 패키지 아래에 두세요. Java 플러그인은 `-parameters`로 컴파일하세요. → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
+- **StarLight AI가 API를 잘 설명하게 하려면** 이벤트의 `description`, `usage`를 짧고 정확하게 쓰고, 스크립트가 받는 타입을 API 클래스와 같은 패키지 아래에 두세요. → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
+- **StarLight AI에 설명을 붙이려면** Gradle 플러그인 0.5.0과 KSP를 적용하고 KDoc과 가이드를 쓰세요. 적용하지 않으면 StarLight AI는 리플렉션으로 본 구조만 보여 줘요. → [KDoc과 가이드 배포하기](/docs/plugins/guides/starlight-ai#kdoc과-가이드-배포하기)
+- **StarLight AI가 플러그인을 어떻게 보는지**는 **설정 → 개발자 모드 → StarLight AI 문서**에서 확인해요. → [개발자 모드에서 확인하기](/docs/plugins/guides/starlight-ai#개발자-모드에서-확인하기)
 
 ### `api_version` 정하기
 
@@ -101,7 +103,7 @@ PluginCore 1.0.0부터 PluginCore 버전을 앱 버전과 맞췄어요. 0.3.2용
 
 - **Kotlin 2.4.20.** PluginCore가 Kotlin 2.1.21 대신 2.4.20으로 컴파일돼서, 더 오래된 컴파일러는 1.0.0 AAR의 클래스를 읽지 못해요. 플러그인의 Kotlin을 2.4.20(또는 바로 이전 마이너 버전)으로 올리세요. → [개발 환경 준비](/docs/plugins/start/setup#필요한-도구)
 - **앱이 제공하는 라이브러리 버전.** 앱의 kotlinx-coroutines가 1.9.0에서 1.11.0으로, kotlinx-serialization이 1.8.1에서 1.11.0으로 올라갔어요. `compileOnly` 버전을 맞추세요. → [앱이 제공하는 라이브러리](/docs/plugins/start/setup#앱이-제공하는-라이브러리)
-- **Gradle 플러그인.** 0.3.0 이상이 1.0.0의 불러오기 규칙(ID, `api_version` 범위, `category`)으로 검사해요. 1.1.0까지 올린다면 0.4.0을 쓰세요. → [0.2.0에서 올리기](/docs/plugins/start/build-and-deploy#0.2.0에서-올리기)
+- **Gradle 플러그인.** 0.3.0 이상이 1.0.0의 불러오기 규칙(ID, `api_version` 범위, `category`)으로 검사해요. 1.1.0까지 올린다면 0.4.0 이상을 쓰세요. → [0.2.0에서 올리기](/docs/plugins/start/build-and-deploy#0.2.0에서-올리기)
 - **`MaterialDialog.setCommonAttrs()`를 썼다면** ConfigDSL에서 지워졌으니 직접 설정하세요. `showConfirmDialog()`는 그대로 있어요.
 
 ### 설정 화면(ConfigDSL)
@@ -141,5 +143,6 @@ Gradle 플러그인 0.4.0은 1.0.1 이전 API의 기록이 없어서, 0.3.2 앱�
 
 | 올릴 버전 | 함께 쓰는 PluginCore | 할 일 |
 |---|---|---|
+| 0.5.0 | 1.1.0 (StarLight AI용 KDoc 배포) | [0.4.x에서 올리기](/docs/plugins/start/build-and-deploy#0.4.x에서-올리기) |
 | 0.4.0 | 1.1.0 (**강력 권장**) | [0.3.x에서 올리기](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기) |
 | 0.3.x | 1.0.x | [0.2.0에서 올리기](/docs/plugins/start/build-and-deploy#0.2.0에서-올리기) |

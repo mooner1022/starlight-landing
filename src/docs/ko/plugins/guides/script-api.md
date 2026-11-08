@@ -106,7 +106,7 @@ Kotlin `object`의 함수를 스크립트에서 정적 메서드로 부르려면
 - **스레드** — 스크립트는 프로젝트의 작업 스레드에서 API를 호출해요. 메인 스레드가 아니므로 뷰를 직접 건드리지 말고 `Handler(Looper.getMainLooper())` 등으로 넘기세요. 스크립트가 넘긴 콜백을 다른 스레드에서 부른다면 아래 [스크립트 콜백과 스레드](#스크립트-콜백과-스레드)를 확인하세요.
 - **값의 형식** — 스크립트가 넘긴 함수나 객체는 언어의 값 형식 그대로 들어와요. Rhino는 Rhino 객체, NeonJS는 `NeonValue`예요(웹 서버 플러그인은 그래서 `dev.mooner.neonjs:neonjs-core`를 `compileOnly`로 참조해요). 가능하면 문자열, 숫자, 불리언처럼 단순한 형식으로 주고받으세요.
 - **자동 완성** — `getApiObjects<T>()`는 클래스의 필드와 메서드를 리플렉션으로 모아요. 에디터는 이름에 `$`가 들어간 멤버를 숨겨요.
-- **StarLight AI** — PluginCore 1.1.0부터 StarLight AI도 등록된 API의 구조를 읽어 설명해요. 스크립트가 받는 타입은 API 클래스와 같은 패키지 아래에 두세요. → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
+- **StarLight AI** — PluginCore 1.1.0부터 StarLight AI도 등록된 API의 구조를 읽어 설명해요. Gradle 플러그인 0.5.0과 KSP로 KDoc을 배포하면 설명도 붙어요. 스크립트가 받는 타입은 API 클래스와 같은 패키지 아래에 두세요. → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
 
 ## 스크립트 콜백과 스레드
 

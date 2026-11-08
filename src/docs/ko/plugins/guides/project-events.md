@@ -87,7 +87,7 @@ export function onAlarm(time, label) {
 
 ## 선택 멤버
 
-아래 멤버는 모두 기본 구현이 있는 `open` 멤버라 오버라이드는 선택이에요. `description`과 `usage`는 프로젝트 설정의 받을 이벤트 목록에 보이고, [StarLight AI](/docs/plugins/guides/starlight-ai#이벤트)는 `description`, `usage`, `functionName`, `scriptArguments`, `listenerName`을 그대로 써요.
+아래 멤버는 모두 기본 구현이 있는 `open` 멤버라 오버라이드는 선택이에요. `description`과 `usage`는 프로젝트 설정의 받을 이벤트 목록에 보이고, [StarLight AI](/docs/plugins/guides/starlight-ai#이벤트)는 `description`, `usage`, `functionName`, `scriptArguments`, `listenerName`을 그대로 써요. [KDoc을 배포](/docs/plugins/guides/starlight-ai#kdoc과-가이드-배포하기)한다면 이벤트 클래스의 KDoc에 스크립트가 받는 인자마다 `@param`을 쓰세요.
 
 | 멤버 | 기본값 | 언제 오버라이드하나 |
 |---|---|---|

@@ -17,6 +17,7 @@ order: 4
 | `starlightLogcat` | StarLight의 로그캣을 스트리밍해요(Ctrl+C로 종료). |
 | `generate<Variant>StarlightManifest` | `starlight.json`을 생성해요(`manifest { }` 블록이 있을 때만). |
 | `scan<Variant>StarlightApiUsage` | 코드가 쓰는 PluginCore API를 찾아 `api_version`을 계산하고 검증해요. `assemble<Variant>Slp`의 일부로 실행돼요. **0.4.0+** → [`api_version` 계산과 검증](#api_version-계산과-검증) |
+| `extractStarlightDocsProcessor` | KSP에 연결할 StarLight AI 문서 프로세서를 꺼내요. KSP를 적용했을 때만 빌드의 일부로 실행돼요. **0.5.0+** → [KDoc과 가이드 배포하기](/docs/plugins/guides/starlight-ai#kdoc과-가이드-배포하기) |
 | `verifyStarlightSdk` | SDK 파일이 있는지 확인해요(매 빌드 전에 실행돼요). |
 
 평소에는 이렇게 반복하면 돼요.
@@ -45,7 +46,7 @@ starlight {
 
 ## 검사 항목
 
-검사 규칙은 StarLight가 플러그인을 읽고 불러오는 방식과 같아요(Gradle 플러그인 0.4.0 기준).
+검사 규칙은 StarLight가 플러그인을 읽고 불러오는 방식과 같아요(Gradle 플러그인 0.5.0 기준).
 
 - `starlight.json`이 `assets/`에 있고 BOM이 없는지. `api_version`이 `0.3.x`라면 `{`로 시작해 `}`로 끝나고 앞뒤에 빈 줄이 없는지도 확인해요.
 - 필수 키(`id`, `name`, `main_class`, `version`, `api_version`, `authors`, `description`)와 그 형식
@@ -59,6 +60,7 @@ starlight {
 - `main_class`가 APK 안에 있고, public이고, 추상 클래스가 아니며, `StarlightPlugin`을 상속하고, 인자 없는 public 생성자가 있는지
 - `uses_native_lib`가 실제 `.so` 파일 포함 여부와 맞는지
 - 앱이 제공하는 라이브러리(PluginCore, ConfigDSL, Kotlin, 주요 AndroidX, Material)를 플러그인에 넣었는지(경고)
+- StarLight AI용 문서가 StarLight가 읽는 위치와 형식(`starlight/agent/<id>.api.json`)인지, 가이드마다 `title`과 `summary`가 있는 front matter가 있는지(경고). 빌드 로그에 문서 요약을 남겨요. → [빌드 확인](/docs/plugins/guides/starlight-ai#빌드-확인)
 
 ## `api_version` 계산과 검증
 
@@ -120,7 +122,7 @@ private fun createProject() = Session.projectManager.newProject(events = starter
 
 ## 참고 사항
 
-- **난독화** — R8을 켠다면 진입점 클래스를 남겨 두세요. `excludeHostKotlinLibraries`를 켰다면 `-dontwarn kotlin.**`도 필요할 수 있어요.
+- **난독화** — R8을 켠다면 진입점 클래스를 남겨 두세요. `excludeHostKotlinLibraries`를 켰다면 `-dontwarn kotlin.**`도 필요할 수 있어요. 스크립트가 쓰는 클래스도 이름을 유지하세요. 스크립트와 StarLight AI용 문서가 모두 클래스와 멤버 이름으로 찾아요.
 
   ```properties title="proguard-rules.pro"
   -keep class com.example.MyPlugin { public <init>(); }
@@ -131,13 +133,21 @@ private fun createProject() = Session.projectManager.newProject(events = starter
 - **같은 ID의 파일** — `plugins/` 폴더에 ID가 같은 `.slp`가 여럿 있으면 StarLight는 `version`이 가장 높은 것을 불러오고 나머지는 제외해요. 배포 태스크는 `<id>.slp`로 저장하므로, 다른 이름으로 남아 있는 예전 파일은 지워 주세요.
 - **구성 캐시** — Gradle 플러그인 0.3.0은 Gradle 구성 캐시(configuration cache)와 함께 쓸 수 있어요.
 
+## 0.4.x에서 올리기
+
+0.5.0에서 고칠 것은 없어요. `plugins { }` 블록의 버전만 바꾸세요.
+
+- KSP를 적용하면 플러그인의 KDoc을 StarLight AI용 문서로 패키지에 넣어요. → [KDoc과 가이드 배포하기](/docs/plugins/guides/starlight-ai#kdoc과-가이드-배포하기)
+- Java와 Kotlin 코드를 매개변수 이름과 함께 컴파일해요(`-parameters`, `-java-parameters`).
+- 가이드의 front matter와 문서 파일의 위치·형식을 검사해요(경고).
+
 ## 0.3.x에서 올리기
 
-PluginCore 1.1.0으로 개발한다면 0.4.0으로 올리는 것을 강력하게 권장해요. `plugins { }` 블록의 버전을 바꾸세요.
+PluginCore 1.1.0으로 개발한다면 0.4.0 이상으로 올리는 것을 강력하게 권장해요. `plugins { }` 블록의 버전을 바꾸세요.
 
 ```kotlin title="app/build.gradle.kts"
 plugins {
-    id("io.github.mooner1022.slplugin") version "0.4.0"
+    id("io.github.mooner1022.slplugin") version "0.5.0"
 }
 ```
 
