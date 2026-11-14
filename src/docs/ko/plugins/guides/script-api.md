@@ -101,22 +101,22 @@ Kotlin `object`의 함수를 스크립트에서 정적 메서드로 부르려면
 
 ## 주의할 점
 
-- **이름 충돌** — 같은 `name`의 API가 이미 있으면 새 API는 경고와 함께 무시돼요. StarLight 기본 API(`Api`, `App`, `BotManager`, `Broadcast`, `Bridge`, `DataBase`, `Device`, `EventEmitter`, `FileStream`, `HomeWidget`, `Languages`, `Log`, `Notification`, `Platform`, `Plugins`, `Projects`, `Utils` 등)와도 겹치지 않는 이름을 쓰세요.
+- **이름 충돌** — 같은 `name`의 API가 이미 있으면 새 API는 경고와 함께 무시돼요. StarLight 기본 API(`Api`, `App`, `AppData`, `BotManager`, `Broadcast`, `Bridge`, `Chat`, `Database`, `DataBase`, `Device`, `Env`, `EventEmitter`, `FileStream`, `Format`, `GlobalLog`, `HomeWidget`, `Http`, `Languages`, `Log`, `MediaSharer`, `Notification`, `Platform`, `Plugins`, `Projects`, `Schedule`, `Security`, `Store`, `Utils` 등)와도 겹치지 않는 이름을 쓰세요. `Chat`, `Store`, `Schedule`, `Format`, `AppData`, `GlobalLog`, `Http`, `Security`, `Database`는 StarLight 1.2.0에서 새로 생긴 이름이에요. 그리고 Rhino 스크립트의 최상위 `const`는 같은 이름의 API보다 우선해서, 스크립트가 쓰는 변수 이름과 겹치면 그 스크립트에서는 API가 가려져요.
 - **주입 시점** — API는 프로젝트를 컴파일할 때 들어가요. 플러그인이 켜지기 전에 컴파일된 프로젝트는 다시 컴파일해야 새 API가 보여요.
 - **스레드** — 스크립트는 프로젝트의 작업 스레드에서 API를 호출해요. 메인 스레드가 아니므로 뷰를 직접 건드리지 말고 `Handler(Looper.getMainLooper())` 등으로 넘기세요. 스크립트가 넘긴 콜백을 다른 스레드에서 부른다면 아래 [스크립트 콜백과 스레드](#스크립트-콜백과-스레드)를 확인하세요.
 - **값의 형식** — 스크립트가 넘긴 함수나 객체는 언어의 값 형식 그대로 들어와요. Rhino는 Rhino 객체, NeonJS는 `NeonValue`예요(웹 서버 플러그인은 그래서 `dev.mooner.neonjs:neonjs-core`를 `compileOnly`로 참조해요). 가능하면 문자열, 숫자, 불리언처럼 단순한 형식으로 주고받으세요.
 - **자동 완성** — `getApiObjects<T>()`는 클래스의 필드와 메서드를 리플렉션으로 모아요. 에디터는 이름에 `$`가 들어간 멤버를 숨겨요.
-- **StarLight AI** — PluginCore 1.1.0부터 StarLight AI도 등록된 API의 구조를 읽어 설명해요. Gradle 플러그인 0.5.0과 KSP로 KDoc을 배포하면 설명도 붙어요. 스크립트가 받는 타입은 API 클래스와 같은 패키지 아래에 두세요. → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
+- **StarLight AI** — PluginCore 1.1.0부터 StarLight AI도 등록된 API의 구조를 읽어 설명해요. Gradle 플러그인 0.5.0 이상과 KSP로 KDoc을 배포하면 설명도 붙어요. 스크립트가 받는 타입은 API 클래스와 같은 패키지 아래에 두세요. → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
 
 ## 스크립트 콜백과 스레드
 
-StarLight 1.1.0의 NeonJS는 0.1.7이에요. NeonJS 프로젝트 하나의 스크립트는 컨텍스트 락을 쥔 스레드 하나에서만 실행돼요. 스크립트가 넘긴 함수(콜백, Java 인터페이스로 바뀐 JS 함수)를 다른 스레드에서 호출하면, 그 스레드는 스크립트의 다른 코드가 끝날 때까지 기다려요. **대기 시간 제한은 없어요.**
+StarLight 1.1.0의 NeonJS는 0.1.7, 1.2.0은 0.1.8이에요. NeonJS 프로젝트 하나의 스크립트는 컨텍스트 락을 쥔 스레드 하나에서만 실행돼요. 스크립트가 넘긴 함수(콜백, Java 인터페이스로 바뀐 JS 함수)를 다른 스레드에서 호출하면, 그 스레드는 스크립트의 다른 코드가 끝날 때까지 기다려요. **대기 시간 제한은 없어요.**
 
 ### 다른 스레드에서 실행하고 결과를 기다릴 때
 
 콜백을 다른 스레드에서 실행하고 그 결과를 기다리는 API는, 기다리는 동안 컨텍스트를 놓아야 해요. 그러지 않으면 데드락이 나요. 스크립트 스레드는 락을 쥐고 기다리고, 콜백을 실행할 스레드는 그 락을 기다리기 때문이에요. 메인 스레드에서 이 상황이 나면 ANR로 이어져요. StarLight의 `Api.UIThread`도 이 방식으로 고쳤어요.
 
-NeonJS 0.1.7의 `NeonContext.releasing`을 쓰세요. 현재 스레드가 쥔 락을 모두 풀고 블록을 실행한 뒤 다시 잡아요.
+NeonJS 0.1.7부터 있는 `NeonContext.releasing`을 쓰세요. 현재 스레드가 쥔 락을 모두 풀고 블록을 실행한 뒤 다시 잡아요.
 
 ```kotlin
 fun <R> waitOffScriptThread(block: () -> R): R {
@@ -130,7 +130,7 @@ val result = waitOffScriptThread { runBlocking(Dispatchers.Main) { callback.call
 ```
 
 - `releasing` 블록이 도는 동안에는 다른 스레드가 같은 스크립트의 코드를 실행할 수 있어요. 블록 앞뒤로 스크립트 상태가 바뀌어 있을 수 있다는 점을 전제로 작성하세요.
-- `releasing`을 쓰려면 `dev.mooner.neonjs:neonjs-core:0.1.7`을 `compileOnly`로 추가해야 해요. 저장소는 `https://mooner1022.github.io/neon-js/maven`이에요.
+- `releasing`을 쓰려면 `dev.mooner.neonjs:neonjs-core:0.1.7` 이상을 `compileOnly`로 추가해야 해요. 앱에 든 버전(StarLight 1.2.0은 0.1.8)에 맞추면 좋아요. 저장소는 `https://mooner1022.github.io/neon-js/maven`이에요.
 
 ```kotlin title="settings.gradle.kts"
 dependencyResolutionManagement {
@@ -142,7 +142,7 @@ dependencyResolutionManagement {
 
 ```kotlin title="app/build.gradle.kts"
 dependencies {
-    compileOnly("dev.mooner.neonjs:neonjs-core:0.1.7")
+    compileOnly("dev.mooner.neonjs:neonjs-core:0.1.8")
 }
 ```
 

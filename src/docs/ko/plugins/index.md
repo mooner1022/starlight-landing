@@ -50,7 +50,7 @@ PluginCore와 ConfigDSL은 [SDK 페이지](/docs/plugins/sdk)에서 버전별 �
 3. **API 레퍼런스** — 클래스와 메서드를 찾아볼 때 써요.
 
 > [!IMPORTANT]
-> 이 문서는 **StarLight nightly 브랜치(PluginCore 1.1.0)** 를 기준으로 해요. PluginCore 1.1.0은 아직 예비 사양이라 바뀔 수 있어요. 현재 정식·베타 앱(StarLight 1.0.1)에는 PluginCore 1.0.1이, 그 이전 앱인 StarLight 0.3.4b에는 PluginCore 0.3.2가 들어 있어요. 버전에 따라 다른 기능에는 **PluginCore 1.1.0 이상**처럼 따로 표시해 두었어요. 1.1.0의 변경 사항은 [SDK 페이지](/docs/plugins/sdk#1.1.0)에 정리했어요.
+> 이 문서는 **StarLight 1.2.0(PluginCore 1.2.0)** 을 기준으로 해요. StarLight 1.1.0에는 PluginCore 1.1.0이, 1.0.1에는 1.0.1이, 0.3.4b에는 0.3.2가 들어 있어요. 버전에 따라 다른 기능에는 **PluginCore 1.1.0 이상**처럼 따로 표시해 두었어요. 버전별 변경 사항은 [SDK 페이지](/docs/plugins/sdk#1.2.0)에 정리했어요.
 >
 > 플러그인은 **GitHub 판(APK)** 에서만 동작해요. Google Play 판은 플러그인을 불러오지 않으니, 개발할 기기에는 GitHub 판을 설치하세요.
 

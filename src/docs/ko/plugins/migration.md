@@ -9,8 +9,9 @@ order: 2
 
 | 지금 쓰는 PluginCore | 볼 곳 |
 |---|---|
-| 1.0.x (StarLight 1.0.x) | [1.0.x에서 1.1.0으로](#1.0.x에서-1.1.0으로) |
-| 0.3.x (StarLight 0.3.4b) | [0.3.2에서 1.0.0으로](#0.3.2에서-1.0.0으로)를 먼저 보고, 이어서 1.0.x에서 1.1.0으로 |
+| 1.1.x (StarLight 1.1.x) | [1.1.x에서 1.2.0으로](#1.1.x에서-1.2.0으로) |
+| 1.0.x (StarLight 1.0.x) | [1.0.x에서 1.1.0으로](#1.0.x에서-1.1.0으로)를 먼저 보고, 이어서 1.1.x에서 1.2.0으로 |
+| 0.3.x (StarLight 0.3.4b) | [0.3.2에서 1.0.0으로](#0.3.2에서-1.0.0으로), 1.0.x에서 1.1.0으로, 1.1.x에서 1.2.0으로를 차례로 |
 
 ## 먼저 알아 둘 것
 
@@ -19,23 +20,37 @@ order: 2
 - **새 앱에서 기존 플러그인 실행하기.** 플러그인이 상속하는 클래스에는 추상 멤버를 추가하지 않으므로, 다시 빌드하지 않은 기존 플러그인도 대부분 새 앱에서 불러와져요. 다만 새 앱의 **동작 변경**은 기존 플러그인에도 적용돼요.
 - **기존 앱에서 새 플러그인 실행하기.** 새 SDK로 빌드한 플러그인이 새 API를 쓰면, 그 API가 없는 기존 앱에서는 그 코드가 실행될 때 `NoSuchMethodError` 같은 `LinkageError`로 실패해요. 기존 앱도 지원한다면 [`api_version`](/docs/plugins/start/manifest#api-버전-호환)을 낮게 두고 새 API를 쓰는 코드를 버전 확인으로 감싸야 해요.
 
+## 1.1.x에서 1.2.0으로
+
+1.1.x용 플러그인은 1.2.0 앱에서 다시 빌드하지 않아도 불러와져요. 1.2.0의 새 API는 앱이 쓰는 인터페이스뿐이라 고를 기능도 없어요. 아래 **동작 변경**만 확인하세요.
+
+### 꼭 확인할 것
+
+- **생명주기 관찰자의 `onEnable`.** 컴파일이 끝나면 상태가 스위치를 따라서, 켜진 프로젝트의 관찰자는 컴파일할 때마다 `onEnable`을 받아요. 여러 번 불려도 문제가 없게 만드세요. → [프로젝트 생명주기](/docs/plugins/reference/projects#프로젝트-생명주기)
+- **`DESTROYED`는 삭제만 뜻하지 않아요.** 다시 컴파일하다 실패한 프로젝트도 다음 컴파일에 성공할 때까지 `DESTROYED`예요(관찰자는 `onDestroy`를 받아요). 프로젝트가 지워졌다고 보고 데이터를 지우는 코드가 있다면 고치세요.
+- **켜다가 실패하면 플러그인이 통째로 빠져요.** `onEnable`이 예외를 던지면 플러그인이 등록한 언어, 위젯, API, API 레벨, 이벤트가 모두 빠지고, 이 플러그인이 꼭 필요한 플러그인도 불러오지 않아요. 실패한 뒤에도 등록한 것이 남아 있다고 기대하는 코드가 있다면 고치세요. → [수명 주기](/docs/plugins/reference/plugin#수명-주기)
+- **assets와 네이티브 라이브러리를 다시 풀어요.** 플러그인 파일이 바뀌면 `assetRevision`을 올리지 않아도 다시 풀어요(올려도 괜찮아요). 풀어 둔 파일을 고쳐 쓰던 플러그인이라면, 업데이트할 때 원래대로 돌아가니 고친 내용은 다른 곳에 저장하세요. 1.2.0으로 업데이트한 뒤 처음 시작할 때 모든 플러그인을 한 번씩 다시 풀어요. → [정보와 파일](/docs/plugins/reference/plugin#정보와-파일)
+- **점으로만 된 ID는 거부해요.** `..`처럼 점(`.`)으로만 된 플러그인 ID는 불러오지 않아요.
+- **스크립트 API의 전역 이름.** 1.2.0에서 스크립트에 `Store`, `Chat`, `Schedule`, `Format`, `AppData`, `GlobalLog`, `Http`, `Security`, `Database` 전역이 생겼어요. 같은 이름의 API를 등록했다면 이름을 바꾸세요. → [주의할 점](/docs/plugins/guides/script-api#주의할-점)
+- **`callFunction("onMessage", …)`로 메시지를 보내는 플러그인.** 스크립트가 `Chat.waitFor()`로 기다리던 답 메시지는 `onMessage`로 가지 않고 건너뛰어요. → [메서드](/docs/plugins/reference/projects#메서드)
+- **Gradle 플러그인 0.5.1.** `src/main/assets/starlight.json`을 직접 쓴다면 `target_api_version`을 넣어야 빌드가 통과해요. → [0.5.0에서 올리기](/docs/plugins/start/build-and-deploy#0.5.0에서-올리기)
+
+`api_version`은 그대로 두세요. 1.2.0에서 플러그인이 쓸 새 API는 없어요.
+
 ## 1.0.x에서 1.1.0으로
 
 1.0.x용 플러그인은 1.1.0 앱에서 수정 없이 불러와져요. 다시 빌드하지 않아도 아래 **동작 변경**은 적용되니 확인하세요.
 
-> [!NOTE]
-> PluginCore 1.1.0은 예비 사양이라 바뀔 수 있어요. SDK는 StarLight 저장소의 nightly 브랜치에서 빌드하세요.
-
 ### 꼭 확인할 것
 
-- **Gradle 플러그인을 0.4.0 이상(지금은 0.5.0)으로 올리세요(강력 권장).** 1.1.0에서 매니페스트 메타데이터와 버전 처리가 여러 가지 바뀌었고, 0.3.x는 이를 반영하지 못해요. 0.4.0은 코드가 쓰는 PluginCore API로 `api_version`을 계산하고 검증해요. 코드가 1.1.0 API를 쓰는데 적어 둔 `api_version`이 그보다 낮으면 빌드가 실패하니, `api_version`을 올리거나 그 코드를 [`@RequiresPluginCore`](/docs/plugins/start/build-and-deploy#requiresplugincore)로 표시하세요. → [0.3.x에서 올리기](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기)
+- **Gradle 플러그인을 0.4.0 이상(지금은 0.5.1)으로 올리세요(강력 권장).** 1.1.0에서 매니페스트 메타데이터와 버전 처리가 여러 가지 바뀌었고, 0.3.x는 이를 반영하지 못해요. 0.4.0은 코드가 쓰는 PluginCore API로 `api_version`을 계산하고 검증해요. 코드가 1.1.0 API를 쓰는데 적어 둔 `api_version`이 그보다 낮으면 빌드가 실패하니, `api_version`을 올리거나 그 코드를 [`@RequiresPluginCore`](/docs/plugins/start/build-and-deploy#requiresplugincore)로 표시하세요. → [0.3.x에서 올리기](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기)
 - **리스너의 생명주기.** 로드가 끝나면 `isEnabled()`가 `true`가 되고, `onEnable()` 안에서 추가한 리스너도 `onEnable`을 받아요. 언로드할 때는 모든 리스너가 `onDisable`을 받아요. → [켜고 끄는 순서](/docs/plugins/reference/plugin#켜고-끄는-순서)
   - `listener.onEnable()`을 직접 부르던 우회 코드는 지우세요. 1.1.0에서는 두 번 호출돼요.
   - `onDisable`은 `onEnable`이 실행되지 않은 리스너에도 호출될 수 있어요. `lateinit`이나 아직 등록하지 않은 리시버를 건드리기 전에 초기화됐는지 확인하세요.
   - `isEnabled()`가 `false`인 것을 전제로 한 코드가 있다면 고치세요.
 - **같은 프로젝트를 컴파일하는 흐름 안에서 다시 컴파일하지 마세요.** 같은 프로젝트의 컴파일은 한 번에 하나만 실행돼서, 재진입하면 60초를 기다린 뒤 실패해요. 플러그인 언어의 `compile` 안이나 컴파일 중에 동기로 호출되는 리스너(생명주기 관찰자 등)가 대표적인 경우예요. → [컴파일은 한 번에 하나](/docs/plugins/reference/projects#컴파일은-한-번에-하나)
 - **플러그인 언어라면 `formatDefaultCode`.** 2인자만 오버라이드했다면 그대로 동작해요. 고칠 일이 있다면 3인자 형식만 오버라이드하세요. → [새 프로젝트 시작 코드](/docs/plugins/reference/plugin#새-프로젝트-시작-코드)
-- **스크립트 콜백을 다른 스레드에서 실행하고 결과를 기다리는 API.** 기다리는 동안 `NeonContext.releasing`으로 컨텍스트를 놓지 않으면 데드락이 나요. `neonjs-core:0.1.7`을 `compileOnly`로 추가해야 해요. → [스크립트 콜백과 스레드](/docs/plugins/guides/script-api#스크립트-콜백과-스레드)
+- **스크립트 콜백을 다른 스레드에서 실행하고 결과를 기다리는 API.** 기다리는 동안 `NeonContext.releasing`으로 컨텍스트를 놓지 않으면 데드락이 나요. `neonjs-core:0.1.7` 이상(StarLight 1.2.0은 0.1.8)을 `compileOnly`로 추가해야 해요. → [스크립트 콜백과 스레드](/docs/plugins/guides/script-api#스크립트-콜백과-스레드)
 - **스크립트가 플러그인 객체의 `originalFile`을 읽고 있었다면** 이제 보이지 않아요(`@JvmSynthetic`).
 
 ### 1.1.0 기능 쓰기 (선택)
@@ -44,7 +59,7 @@ order: 2
 - **시작 코드의 함수 이름이 StarLight 이벤트와 겹칠 수 있다면** `alternateFunctionName`을 정하세요. `generateCode(generator)`를 오버라이드했다면 `generateCode(generator, name)`도 반드시 함께 오버라이드하세요. → [함수 이름이 겹칠 때](/docs/plugins/guides/project-events#함수-이름이-겹칠-때)
 - **프로젝트를 만드는 플러그인**이라면 `allowedEventIds`로 받을 이벤트를 처음부터 정할 수 있어요. → [프로젝트 만들기](/docs/plugins/reference/projects#프로젝트-만들기)
 - **StarLight AI가 API를 잘 설명하게 하려면** 이벤트의 `description`, `usage`를 짧고 정확하게 쓰고, 스크립트가 받는 타입을 API 클래스와 같은 패키지 아래에 두세요. → [StarLight AI와 플러그인](/docs/plugins/guides/starlight-ai)
-- **StarLight AI에 설명을 붙이려면** Gradle 플러그인 0.5.0과 KSP를 적용하고 KDoc과 가이드를 쓰세요. 적용하지 않으면 StarLight AI는 리플렉션으로 본 구조만 보여 줘요. → [KDoc과 가이드 배포하기](/docs/plugins/guides/starlight-ai#kdoc과-가이드-배포하기)
+- **StarLight AI에 설명을 붙이려면** Gradle 플러그인 0.5.0 이상과 KSP를 적용하고 KDoc과 가이드를 쓰세요. 적용하지 않으면 StarLight AI는 리플렉션으로 본 구조만 보여 줘요. → [KDoc과 가이드 배포하기](/docs/plugins/guides/starlight-ai#kdoc과-가이드-배포하기)
 - **StarLight AI가 플러그인을 어떻게 보는지**는 **설정 → 개발자 모드 → StarLight AI 문서**에서 확인해요. → [개발자 모드에서 확인하기](/docs/plugins/guides/starlight-ai#개발자-모드에서-확인하기)
 
 ### `api_version` 정하기
@@ -143,6 +158,7 @@ Gradle 플러그인 0.4.0은 1.0.1 이전 API의 기록이 없어서, 0.3.2 앱�
 
 | 올릴 버전 | 함께 쓰는 PluginCore | 할 일 |
 |---|---|---|
-| 0.5.0 | 1.1.0 (StarLight AI용 KDoc 배포) | [0.4.x에서 올리기](/docs/plugins/start/build-and-deploy#0.4.x에서-올리기) |
-| 0.4.0 | 1.1.0 (**강력 권장**) | [0.3.x에서 올리기](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기) |
+| 0.5.1 | 1.1.0 이상 | [0.5.0에서 올리기](/docs/plugins/start/build-and-deploy#0.5.0에서-올리기) |
+| 0.5.0 | 1.1.0 이상 (StarLight AI용 KDoc 배포) | [0.4.x에서 올리기](/docs/plugins/start/build-and-deploy#0.4.x에서-올리기) |
+| 0.4.0 | 1.1.0 이상 (**강력 권장**) | [0.3.x에서 올리기](/docs/plugins/start/build-and-deploy#0.3.x에서-올리기) |
 | 0.3.x | 1.0.x | [0.2.0에서 올리기](/docs/plugins/start/build-and-deploy#0.2.0에서-올리기) |

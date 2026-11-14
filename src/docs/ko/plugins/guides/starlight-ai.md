@@ -5,7 +5,7 @@ order: 3
 ---
 
 > [!IMPORTANT]
-> **PluginCore 1.1.0 이상**(StarLight 1.1.0)의 기능이에요. 1.1.0은 아직 예비 사양이라 바뀔 수 있어요. 플러그인의 KDoc과 가이드를 읽는 기능과 개발자 모드의 문서 확인 화면은 스냅샷 `1.1.0-261108`(versionCode 1000147)부터 들어 있어요.
+> **PluginCore 1.1.0 이상**(StarLight 1.1.0 이상)의 기능이에요.
 
 StarLight AI는 앱이 따로 들고 있던 문서 사본 대신, 실행 중인 앱에 등록된 API와 이벤트에서 문서를 만들어요. 그래서 플러그인이 등록한 API와 이벤트도 아래 도구에 함께 나와요. 별도 설정은 필요 없어요.
 
@@ -71,13 +71,13 @@ KDoc을 배포하면 이 규칙과 관계없이, 문서 파일에 있는 플러�
 
 ### 설정
 
-Gradle 플러그인을 0.5.0으로 올리고, `plugins { }` 블록에 KSP를 추가해요. 나머지는 Gradle 플러그인이 맡아요.
+Gradle 플러그인을 0.5.0 이상(지금은 0.5.1)으로 올리고, `plugins { }` 블록에 KSP를 추가해요. 나머지는 Gradle 플러그인이 맡아요.
 
 ```kotlin title="app/build.gradle.kts"
 plugins {
     id("com.android.application")
     id("com.google.devtools.ksp") version "2.3.13"     // AGP 8.12 이상
-    id("io.github.mooner1022.slplugin") version "0.5.0"
+    id("io.github.mooner1022.slplugin") version "0.5.1"
 }
 ```
 

@@ -9,10 +9,10 @@ export interface SdkArtifact {
 }
 
 export const SDK_RELEASE = {
-	version: '1.1.0',
-	date: '2026-11-07',
-	/** PluginCore 1.1.0 is a preview on StarLight's nightly branch; the released StarLight 1.0.1 ships 1.0.1. */
-	channel: 'nightly' as const,
+	version: '1.2.0',
+	date: '2026-11-14',
+	/** PluginCore 1.2.0 ships in StarLight 1.2.0, the release on every channel. */
+	channel: 'release' as const,
 	artifacts: [
 		{ id: 'plugincore', name: 'PluginCore', file: 'PluginCore-release.aar', url: null },
 		{ id: 'configdsl', name: 'ConfigDSL', file: 'ConfigDSL-release.aar', url: null }
