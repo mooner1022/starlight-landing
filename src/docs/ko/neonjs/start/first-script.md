@@ -8,7 +8,7 @@ order: 1
 
 ## 프로젝트 만들기
 
-**프로젝트** 탭 → **새 프로젝트**에서 언어로 **JS(NeonJS)** 를 고르고, 이벤트는 `onMessage`를 고른 채 만들어요. 메인 파일에는 이런 틀이 들어 있어요.
+**프로젝트** 탭 → **새 프로젝트**에서 API 방식은 기본인 **StarLight 오리지널**을 그대로 두고, 언어로 **JS(NeonJS)** 를 고르고, 이벤트는 `onMessage`를 고른 채 만들어요. 메인 파일에는 이런 틀이 들어 있어요.
 
 ```javascript title="my-bot.js"
 export function onMessage(event) {
@@ -22,7 +22,7 @@ NeonJS 프로젝트의 메인 파일은 **ES 모듈**로 실행돼요.
 
 1. **컴파일할 때** 파일의 최상위 코드가 한 번 실행돼요. `import`한 모듈도 이때 읽혀요.
 2. 그 뒤 메시지가 올 때마다 StarLight가 **`export`한 함수**를 찾아 불러요.
-3. 다시 컴파일하면 이전 상태는 모두 사라지고 1번부터 새로 시작해요.
+3. 다시 컴파일하면 이전 상태는 모두 사라지고 1번부터 새로 시작해요. 다시 컴파일하다 실패하면 이전 코드도 타이머까지 멈추고, 다음 컴파일에 성공할 때까지 프로젝트는 쉬어요.
 
 ```javascript title="my-bot.js"
 console.log("컴파일할 때 한 번 실행돼요");
@@ -36,7 +36,7 @@ export function onMessage(event) {
 ```
 
 > [!IMPORTANT]
-> 이벤트 함수는 반드시 `export` 해야 해요. `export`가 없으면 StarLight가 함수를 찾지 못해 아무 일도 일어나지 않아요.
+> 이벤트 함수는 반드시 `export` 해야 해요. `export`가 없으면 StarLight가 함수를 찾지 못해 아무 일도 일어나지 않아요. 에디터의 [코드 검사](/docs/app/guides/editor#코드-검사)가 `export`하지 않은 이벤트 함수를 알려 줘요.
 
 모듈은 항상 엄격 모드(strict mode)로 실행돼요. 선언하지 않은 변수에 값을 넣으면 `ReferenceError`가 나니, 변수는 `let`이나 `const`로 선언하세요.
 
@@ -70,7 +70,7 @@ export function onMessage(event) {
 
 ## 로그 보기
 
-`console.log()`로 남긴 내용은 프로젝트 로그에 들어가요. 에디터의 서랍(☰) → **로그** 탭이나 **로그** 탭에서 볼 수 있어요. 오류는 `console.error()`로 남기면 오류 단계로 기록돼요.
+`console.log()`로 남긴 내용은 프로젝트 로그에 들어가요. 에디터의 서랍(☰) → **로그** 탭이나 **로그** 탭에서 볼 수 있어요. 오류는 `console.error()`로 남기면 오류 단계로 기록돼요. 처리하지 않은 오류는 파일, 줄, 열과 함께 로그에 남고, 에디터 서랍의 **문제** 탭에도 보여요.
 
 ```javascript
 export function onMessage(event) {
@@ -85,8 +85,17 @@ export function onMessage(event) {
 > [!TIP]
 > 처리하지 않은 오류가 이벤트 함수 밖으로 나가면 기본 설정에서 프로젝트가 꺼져요. 실패할 수 있는 작업은 `try`/`catch`로 감싸세요.
 
+처리하지 않은 오류를 한곳에서 받으려면 `onUncaughtError`를 내보내요. 오류가 로그에 남은 뒤 불리니, 방에 알리는 데 쓰기 좋아요. 이 함수가 있어도 **오류 발생시 비활성화** 설정은 그대로 적용돼요.
+
+```javascript
+export function onUncaughtError(error, origin, detail) {
+    detail.args[0]?.room?.send(`문제가 생겼어요: ${error.message}`);
+}
+```
+
 ## 다음 단계
 
 - [모듈 나누기](/docs/neonjs/guides/modules) — 코드가 길어지면 파일을 나눠요.
 - [비동기와 네트워크](/docs/neonjs/guides/async) — `fetch`로 외부 API를 불러요.
 - [이벤트 함수](/docs/app/reference/events) — `onMessage` 말고 받을 수 있는 이벤트와 `event` 객체의 구조예요.
+- [스크립트 API](/docs/app/reference/script-api) — 값을 남기는 `Store`, 정해진 시각에 실행하는 `Schedule`, 다음 메시지를 기다리는 `Chat.waitFor()`, 숫자와 날짜를 꾸미는 `Format`이 있어요.

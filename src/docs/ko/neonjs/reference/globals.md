@@ -21,12 +21,13 @@ const unique = new Set([1, 2, 3]).union(new Set([3, 4]));
 | `setTimeout(fn, ms, ...args)` | `ms` 밀리초 뒤에 `fn`을 한 번 불러요. 타이머 ID(숫자)를 돌려줘요. |
 | `setInterval(fn, ms, ...args)` | `fn`이 끝날 때마다 `ms` 밀리초를 기다렸다가 다시 불러요. |
 | `clearTimeout(id)`, `clearInterval(id)` | 타이머를 취소해요. |
-| `toast(message, duration?)` | 화면 아래에 짧은 안내 메시지를 띄워요. `duration`은 `0`(짧게) 또는 `1`(길게, 기본값)이에요. |
+| `toast(message, duration?)` | 화면 아래에 짧은 안내 메시지를 띄워요. `duration`은 `0`(짧게, 기본값) 또는 `1`(길게)이에요. |
+| `repeat(fn, count, args?)` | `fn`을 그 자리에서 `count`번 불러 결과를 배열로 돌려줘요. `args`가 배열이면 펼쳐서, 아니면 그대로 인자로 넘겨요. `fn`에서 난 오류는 그 차례의 결과를 `null`로 남겨요. |
 | `Java` | Java·Android 클래스에 접근해요. [Java와 Android API 쓰기](/docs/neonjs/guides/java)를 보세요. |
 
 타이머는 StarLight가 프로젝트의 작업으로 실행해요. 콜백에서 난 오류는 `Exception on timer <ID>` 로그로 남아요. 타이머는 프로젝트를 다시 컴파일하거나 스코프를 폐기하면 취소되고, **프로젝트 스위치를 끄는 것만으로는 멈추지 않아요.**
 
-StarLight의 기본 API(`Api`, `Utils`, `Log`, `FileStream` 등)와 켜져 있는 플러그인이 등록한 API도 전역으로 들어와요. 목록은 [스크립트 API](/docs/app/reference/script-api)를 보세요.
+프로젝트가 고른 [API 방식](/docs/app/guides/projects#api-방식)의 API(StarLight 오리지널이면 `Log`, `Chat`, `Store`, `Schedule`, `Format` 등, 메신저봇 레거시면 `Api`, `Utils`, `DataBase` 등)와 켜져 있는 플러그인이 등록한 API도 전역으로 들어와요. 목록은 [스크립트 API](/docs/app/reference/script-api)를 보세요.
 
 ## console
 
@@ -39,7 +40,7 @@ StarLight의 기본 API(`Api`, `Utils`, `Log`, `FileStream` 등)와 켜져 있�
 | `console.warn` | 경고 |
 | `console.error`, `console.trace`, `console.assert` (실패할 때) | 오류 |
 
-`console.log("%s님 안녕하세요", name)`처럼 서식 지정자(`%s`, `%d`, `%o` 등)도 쓸 수 있어요.
+`console.log("%s님 안녕하세요", name)`처럼 서식 지정자(`%s`, `%d`, `%o` 등)도 쓸 수 있어요. `console.clear()`는 프로젝트 로그를 비워요.
 
 ## 웹 표준 전역
 
@@ -60,7 +61,7 @@ StarLight의 기본 API(`Api`, `Utils`, `Log`, `FileStream` 등)와 켜져 있�
 
 | 없는 것 | 대신 |
 |---|---|
-| `Intl`, 로케일에 맞춘 `toLocaleString()` | `toLocaleString()`은 로케일과 무관한 기본 형식을 돌려줘요(`(1234567).toLocaleString()`은 `"1234567"`). 자릿수 구분 같은 서식은 직접 만들거나 Java의 `NumberFormat`, `DateTimeFormatter`를 쓰세요. |
+| `Intl`, 로케일에 맞춘 `toLocaleString()` | `toLocaleString()`은 로케일과 무관한 기본 형식을 돌려줘요(`(1234567).toLocaleString()`은 `"1234567"`). 자릿수 구분, 날짜, 조사 같은 서식은 [`Format`](/docs/app/reference/script-api#문자열-만들기-format)(StarLight 오리지널 방식)을 쓰세요. `Format.number(1234567)`은 `"1,234,567"`이에요. |
 | `require()`, `module.exports` | `import` / `export`를 써요. [모듈 나누기](/docs/neonjs/guides/modules)를 보세요. |
 | `process`, `Buffer`, `node:` 모듈 | Node.js API는 들어 있지 않아요. 바이트는 `Uint8Array`, 환경 값은 StarLight API로 다뤄요. |
 | `window`, `document` 같은 DOM | 화면이 없는 환경이에요. |

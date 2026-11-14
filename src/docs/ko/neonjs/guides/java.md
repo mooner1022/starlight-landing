@@ -56,7 +56,7 @@ console.log(Java.type("java.lang.Math")["max(int,int)"](1, 2));
 | `null` | `null` |
 | 그 밖의 객체 (`StringBuilder` 같은 `CharSequence` 포함) | Java 객체 그대로 |
 
-반대로 JS 값을 Java 메서드에 넘길 때는 메서드의 매개변수 형식에 맞춰 바뀌어요. 숫자는 `int`/`long`/`double`로, JS 배열과 객체는 `List`/`Map`으로, JS 함수는 콜백 인터페이스로 바뀌어요.
+반대로 JS 값을 Java 메서드에 넘길 때는 메서드의 매개변수 형식에 맞춰 바뀌어요. 숫자는 `int`/`long`/`double`로, JS 배열과 객체는 `List`/`Map`으로, JS 함수는 콜백 인터페이스로 바뀌어요. `null`과 `undefined`는 둘 다 `null`로 넘어가요.
 
 > [!WARNING]
 > **64비트 ID는 BigInt일 수 있어요.** 카카오톡의 `chatLogId`처럼 2⁵³보다 큰 `long`은 BigInt로 들어와요. 이런 값은 숫자 리터럴과 비교하지 말고 BigInt 리터럴(`id === 1234567890123456789n`)이나 문자열(`String(id)`)로 비교하세요. BigInt는 `JSON.stringify()`에 넣으면 오류가 나고, 숫자와 섞어 계산할 수 없어요.
@@ -67,6 +67,9 @@ console.log(Java.type("java.lang.Math")["max(int,int)"](1, 2));
 ## 배열과 컬렉션
 
 Java 배열과 `List`는 JS 배열처럼 인덱스와 `length`로 읽고, `for…of`와 전개 구문(`...`)에도 쓸 수 있어요. `Map`은 항목을 속성처럼 읽고 써요.
+
+> [!WARNING]
+> Java 배열과 `List`는 JS 배열이 아니라서 `map()`, `filter()` 같은 배열 메서드가 없어요. 배열 메서드를 쓰려면 `Array.from(x)`나 `Java.from(x)`로 JS 배열로 바꾸세요. `BotManager.getRooms()`, `MediaSharer.getRooms()`가 돌려주는 값과 API2 `msg.args`가 이런 Java 배열이나 `List`예요. `Chat.getRooms()`, `Schedule.getTasks()`, `Schedule.getStored()`, `Store`의 값은 처음부터 JS 배열과 객체예요.
 
 ```javascript
 const HashMap = Java.type("java.util.HashMap");
@@ -80,7 +83,7 @@ for (const item of list) console.log(item);
 JS 배열과 서로 바꿀 때는 `Java.from()`과 `Java.to()`를 써요.
 
 ```javascript
-const jsArray = Java.from(list);                 // Java 배열·컬렉션 → JS 배열
+const jsArray = Java.from(list);                 // Java 배열·컬렉션 → JS 배열 (Array.from(list)도 같아요)
 const longs = Java.to([1, 2, 3], "long[]");      // JS 배열 → Java 배열
 ```
 

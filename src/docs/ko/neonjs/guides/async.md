@@ -21,7 +21,22 @@ export async function onMessage(event) {
 ```
 
 > [!NOTE]
-> StarLight는 async 이벤트 함수가 끝나기를 기다리지 않아요. 함수 안에서 날 수 있는 오류는 `try`/`catch`로 직접 처리하세요.
+> StarLight는 async 이벤트 함수가 끝나기를 기다리지 않아요. 함수 안에서 처리하지 않은 오류는 `Unhandled promise rejection`으로 로그에 남고, [`onUncaughtError`](/docs/app/reference/events#onuncaughterror)를 만들어 두었다면 그 함수에도 전달돼요. 사용자에게 알려야 하는 오류는 `try`/`catch`로 직접 처리하세요.
+
+## 다음 메시지 기다리기
+
+API 방식으로 **StarLight 오리지널**을 고른 프로젝트는 [`Chat.waitFor()`](/docs/app/reference/script-api#대화-chat)로 다음 메시지를 답으로 받을 수 있어요. Promise를 돌려주니 `await`로 기다려요.
+
+```javascript title="main.js"
+export async function onMessage(msg) {
+    if (msg.message !== "!가입") return;
+    msg.room.send("닉네임을 입력해주세요.");
+    const answer = await Chat.waitFor(msg, 30_000);   // 같은 방, 같은 사람의 다음 메시지
+    msg.room.send(answer ? `${answer.message}님, 환영합니다!` : "시간이 초과되었습니다.");
+}
+```
+
+기다리는 동안에도 프로젝트는 다른 메시지를 처리해요. 답이 된 메시지는 기다리던 코드로만 가고 `onMessage`에는 오지 않아요. 시간이 지나도 답이 없으면 `null`이에요.
 
 ## 모듈 최상위의 await
 
@@ -51,6 +66,7 @@ clearInterval(id);
 - `setInterval`은 콜백이 **끝난 뒤부터** 다시 시간을 재요. 콜백이 오래 걸리면 그만큼 간격이 벌어져요.
 - 프로젝트를 다시 컴파일하거나 스코프를 폐기하면 남은 타이머는 모두 취소돼요. 프로젝트 스위치를 꺼도 타이머는 계속 돌아요.
 - 콜백에서 난 오류는 `Exception on timer <ID>: …`로 로그에 남고, `setInterval`은 다음 차례에 계속 실행돼요.
+- 정해진 시각에 실행하거나 앱을 다시 시작해도 남아야 하는 예약은 [`Schedule`](/docs/app/reference/script-api#예약-작업-schedule)을 쓰세요(StarLight 오리지널 방식).
 
 ## fetch
 
@@ -104,9 +120,20 @@ ws.addEventListener("error", (e) => console.error(e.message));
 
 메시지 뒤에는 JS 스택 트레이스가 붙어 있어서, 어느 파일 몇 번째 줄에서 났는지 볼 수 있어요.
 
+이런 오류를 코드에서 받으려면 `onUncaughtError(error, origin, detail)`를 내보내세요. 이벤트 함수, 타이머, Promise에서 아무도 처리하지 않은 오류가 로그에 남은 뒤 불려요. `origin`은 `"uncaughtException"`이나 `"unhandledRejection"`이에요. 자세한 것은 [이벤트 함수](/docs/app/reference/events#onuncaughterror)를 보세요.
+
+```javascript title="main.js"
+export function onUncaughtError(error, origin, detail) {
+    // detail.source: 오류가 난 곳(예: "onMessage"), detail.args: 그 함수의 인자
+    detail.args[0]?.room?.send("문제가 생겼어요.");
+}
+```
+
 ## 오래 걸리는 코드
 
-NeonJS 프로젝트는 한 번에 한 작업만 실행해요. 이벤트 함수 하나가 오래 걸리면 그동안 다른 메시지는 기다려요. 그리고 StarLight는 실행 시간을 제한하지 않아서, 끝나지 않는 반복문은 프로젝트를 멈추게 해요.
+NeonJS 프로젝트는 한 번에 한 작업만 실행해요. 이벤트 함수 하나가 오래 걸리면 그동안 다른 메시지는 기다려요. `await`로 기다리는 동안은 다른 작업이 실행되니, 기다리는 시간은 여기에 들지 않아요. 그리고 StarLight는 실행 시간을 제한하지 않아서, 끝나지 않는 반복문은 프로젝트를 멈추게 해요.
+
+작업 하나가 프로젝트 설정의 **느린 실행 경고 (초)**(기본 10초)보다 오래 끝나지 않으면 프로젝트 로그에 경고가 남아요. 무엇이 실행 중이고 몇 개의 이벤트가 기다리는지 알려 줘서, 멈춘 코드를 찾을 수 있어요.
 
 - 무거운 계산은 나누어 `setTimeout`으로 이어서 실행하세요.
 - 기다리는 작업은 반복문으로 확인하지 말고 `await`나 타이머를 쓰세요.
