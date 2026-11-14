@@ -87,9 +87,9 @@ abstract class Project : CoroutineScope, ProjectLifecycleOwner
 
 | 메서드 | 설명 |
 |---|---|
-| `callFunction(name, args, onException = {})` | 스크립트의 함수를 호출해요. 스크립트 오류는 `onException`으로 전달돼요. |
+| `callFunction(name, args, onException = {})` | 스크립트의 함수를 호출해요. 스크립트 오류는 `onException`으로 전달돼요. **PluginCore 1.2.0 이상**에서는 스크립트가 `Chat.waitFor()`로 기다리던 답 메시지를 `onMessage`로 보내면, 그 호출은 조용히 건너뛰고 `onException`도 부르지 않아요. 답은 기다리던 코드로만 가요. |
 | `isEventCallAllowed(eventId): Boolean` | 프로젝트가 그 [프로젝트 이벤트](/docs/plugins/guides/project-events)를 허용했는지 알려 줘요. |
-| `compile(throwException = false): Boolean` | 다시 컴파일해요. 이전 스코프는 정리돼요. 같은 프로젝트의 컴파일은 [한 번에 하나](#컴파일은-한-번에-하나)만 실행돼요. |
+| `compile(throwException = false): Boolean` | 다시 컴파일해요. 이전 스코프는 정리돼요. 같은 프로젝트의 컴파일은 [한 번에 하나](#컴파일은-한-번에-하나)만 실행돼요. **PluginCore 1.2.0 이상**에서는 새 코드의 컴파일이 실패하면 이전 버전도 내려간 채로 남아요([생명주기](#프로젝트-생명주기) 참고). |
 | `compileAsync(): Flow<Pair<PipelineStage<*, *>, Int>>` | 컴파일 단계와 진행률을 흘려보내며 컴파일해요. `compile`과 같이 한 번에 하나만 실행돼요. |
 | `setEnabled(enabled): Boolean` | 프로젝트를 켜거나 꺼요. |
 | `getDataDirectory(): File` | 데이터베이스, 사용자 데이터 같은 파일을 저장할 폴더예요. |
@@ -160,9 +160,9 @@ project.logger.error("WebServer", "핸들러에서 오류가 발생했어요: ${
 | `ProjectLifecycle.State` | 의미 |
 |---|---|
 | `COMPILING` | 컴파일 중이에요. |
-| `ENABLED` | 켜져 있어요. |
-| `DISABLED` | 꺼져 있어요(컴파일이 끝난 직후 포함). |
-| `DESTROYED` | 정리됐어요. |
+| `ENABLED` | 켜져 있어요. **PluginCore 1.2.0 이상**에서는 켜진 프로젝트의 컴파일이 끝난 직후도 이 상태라서, 관찰자가 컴파일할 때마다 `onEnable`을 받아요. |
+| `DISABLED` | 꺼져 있어요. PluginCore 1.1.x 이하에서는 컴파일이 끝난 직후 늘 이 상태였어요. |
+| `DESTROYED` | 정리됐어요. **PluginCore 1.2.0 이상**에서는 다시 컴파일하다 실패한 프로젝트도 다음 컴파일에 성공할 때까지 이 상태예요. 스위치는 그대로라 프로젝트가 지워졌다는 뜻은 아니에요. |
 
 ```kotlin
 project.getLifecycle().registerObserver(object : ProjectLifecycleObserver.ExplicitObserver {

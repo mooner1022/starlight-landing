@@ -26,6 +26,9 @@ export function onMessage(event) {
 > [!NOTE]
 > `require()`와 `module.exports`(CommonJS)는 쓸 수 없어요. Rhino 프로젝트의 모듈을 가져올 때는 `export`로 바꿔 주세요.
 
+> [!TIP]
+> 숫자에 자릿수 구분 기호를 넣는 정도라면 [`Format.number(15000)`](/docs/app/reference/script-api#문자열-만들기-format)(`"15,000"`)을 써도 돼요. API 방식으로 **StarLight 오리지널**을 고른 프로젝트에서 쓸 수 있어요. 에디터의 [코드 검사](/docs/app/guides/editor#코드-검사)는 불러와 놓고 쓰지 않는 `import`도 알려 줘요.
+
 ## 모듈을 찾는 순서
 
 | 적는 방법 | 찾는 곳 |
@@ -39,7 +42,7 @@ export function onMessage(event) {
 2. 뒤에 `.js`를 붙인 파일 (`format.js`)
 3. 그 이름의 폴더 안 `index.js` (`format/index.js`)
 
-모듈을 찾지 못하면 컴파일할 때 `Cannot find module '<이름>'` 오류가 나요.
+모듈을 찾지 못하면 컴파일할 때 `Cannot find module '<이름>' imported from main.js`처럼 어느 파일이 불렀는지와 함께 오류가 나요.
 
 ## 여러 프로젝트가 함께 쓰는 모듈
 

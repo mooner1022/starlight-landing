@@ -27,18 +27,18 @@ order: 3
 
 | 키 | 형식 | 필수 | 설명 |
 |---|---|---|---|
-| `id` | 문자열 | ✓ | 플러그인을 구분하는 ID예요. 이벤트 ID, 데이터 폴더 이름에도 쓰여요. 영문 대소문자, 숫자, `.`, `_`, `-`만 쓸 수 있고, `global`, `starlight`, `system`, `core`는 쓸 수 없어요. |
+| `id` | 문자열 | ✓ | 플러그인을 구분하는 ID예요. 이벤트 ID, 데이터 폴더 이름에도 쓰여요. 영문 대소문자, 숫자, `.`, `_`, `-`만 쓸 수 있고, `global`, `starlight`, `system`, `core`와 점(`.`)으로만 된 ID는 쓸 수 없어요. |
 | `name` | 문자열 | ✓ | 앱에 표시되는 이름이에요. |
 | `main_class` | 문자열 | ✓ | `StarlightPlugin`을 상속한 클래스의 전체 이름이에요. |
 | `version` | 버전 | ✓ | 플러그인 버전이에요. |
 | `api_version` | 버전 | ✓ | 플러그인에 필요한 가장 낮은 PluginCore 버전이에요. 앱의 PluginCore가 이 버전 이상이어야 불러와요. [API 버전 호환](#api-버전-호환)을 참고하세요. |
-| `target_api_version` | 버전 | | 빌드에 쓴 PluginCore 버전이에요. Gradle 플러그인 0.4.0이 자동으로 기록하고, 직접 써도 돼요(`api_version`보다 낮으면 경고). 지금 앱은 이 값을 읽지 않아요(모르는 키는 무시). 앞으로 동작 변경을 플러그인별로 나눠 적용할 때 쓰여요. |
+| `target_api_version` | 버전 | | 빌드에 쓴 PluginCore 버전이에요. Gradle 플러그인 0.4.0 이상이 자동으로 기록해요. `starlight.json`을 직접 쓴다면 Gradle 플러그인 0.5.1부터는 PluginCore 1.1.0 이상으로 빌드할 때 꼭 넣어야 해요(`api_version`보다 낮으면 경고). 지금 앱은 이 값을 읽지 않아요(모르는 키는 무시). 앞으로 동작 변경을 플러그인별로 나눠 적용할 때 쓰여요. |
 | `authors` | 문자열 배열 | ✓ | 만든 사람 목록이에요. |
 | `description` | 문자열 | ✓ | 플러그인 설명이에요. |
 | `dependency` | 문자열 배열 | | 먼저 불러와야 하는 플러그인 목록이에요. [의존성](#의존성)을 참고하세요. |
 | `category` | 문자열 | | `messenger`, `engine`, `library`, `utility`, `devtools`, `other` 중 하나예요(대소문자 무시). 없거나 모르는 값이면 `other`가 되고, 모르는 값은 Gradle 플러그인이 경고로 알려 줘요. **PluginCore 1.0.0 이상** |
 | `uses_native_lib` | 불리언 | | 플러그인에 `.so` 네이티브 라이브러리가 있으면 `true`로 설정해요. |
-| `assetRevision` | 정수 | | 이 값이 바뀔 때만 StarLight가 플러그인의 assets를 다시 풀어요. assets를 바꿨다면 올려 주세요. |
+| `assetRevision` | 정수 | | 이 값이 바뀌면 StarLight가 플러그인의 assets를 다시 풀어요. **PluginCore 1.2.0 이상** 앱은 플러그인 파일이 바뀌어도 assets와 네이티브 라이브러리를 다시 풀어서 올리지 않아도 되지만, 이전 앱도 지원한다면 assets를 바꿀 때 올려 주세요. |
 | `custom_classloader` | 문자열 | | 직접 만든 클래스 로더를 쓸 때 그 클래스 이름이에요. 대부분의 플러그인에는 필요 없어요. |
 
 버전은 `major.minor.patch` 또는 `major.minor.patch.build` 형식이에요(예: `1.0.0`).
@@ -63,7 +63,7 @@ order: 3
 
 - 버전은 **major와 minor만** 비교해요. `ktor@3.6.0`은 `3.6.0`과 `3.6.9`를 모두 받아들이지만 `3.7.0`은 받아들이지 않아요.
 - 버전 없이 `"ktor?"`라고 쓰면 StarLight가 `?`까지 ID로 읽어서 절대 일치하지 않아요. 버전과 상관없는 선택 의존성은 `"ktor@*?"`로 쓰세요.
-- StarLight는 의존성 순서대로(위상 정렬) 플러그인을 불러와요. 필요한 의존성이 없거나 버전이 맞지 않으면 그 플러그인은 불러오지 않고 이유를 로그에 남겨요.
+- StarLight는 의존성 순서대로(위상 정렬) 플러그인을 불러와요. 필요한 의존성이 없거나 버전이 맞지 않으면 그 플러그인은 불러오지 않고 이유를 로그에 남겨요. **PluginCore 1.2.0 이상** 앱에서는 필요한 플러그인이 켜다가 실패한 경우에도 불러오지 않아요.
 
 ## API 버전 호환
 
@@ -72,8 +72,9 @@ order: 3
 | 앱 | 받아들이는 `api_version` |
 |---|---|
 | StarLight 0.3.4b (PluginCore 0.3.2) | major.minor가 같은 `0.3.x` |
-| StarLight 1.0.x (PluginCore 1.0.x, 현재 정식·베타는 1.0.1) | `0.3.0` 이상, 앱의 PluginCore 이하 |
-| StarLight 1.1.0 nightly (PluginCore 1.1.0) | `0.3.0` 이상, `1.1.0` 이하 |
+| StarLight 1.0.x (PluginCore 1.0.x) | `0.3.0` 이상, 앱의 PluginCore 이하 |
+| StarLight 1.1.x (PluginCore 1.1.0) | `0.3.0` 이상, `1.1.0` 이하 |
+| StarLight 1.2.0 (PluginCore 1.2.0) | `0.3.0` 이상, `1.2.0` 이하 |
 
 PluginCore 1.0.0 이상 앱은 `api_version`이 앱의 PluginCore보다 높은 플러그인을 건너뛰고, 로그에 "PluginCore 1.1.0 이상이 필요해요" 같은 이유를 남겨요. 지원 하한(`0.3.0`)보다 낮은 플러그인도 건너뛰어요.
 

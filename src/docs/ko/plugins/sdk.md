@@ -12,8 +12,9 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 
 | 버전 | 날짜 | 포함된 앱 |
 |---|---|---|
-| **1.1.0** | 예비 사양 | StarLight 1.1.0 스냅샷(nightly) |
-| **1.0.1** | 2026-11-06 | StarLight 1.0.1 (현재 정식·베타 앱) |
+| **1.2.0** | 2026-11-14 | StarLight 1.2.0 |
+| 1.1.0 | 2026-11-10 | StarLight 1.1.0 |
+| 1.0.1 | 2026-11-06 | StarLight 1.0.1 |
 | 1.0.0 | 2026-10-30 | StarLight 1.0.0 |
 | 0.3.3 | 2026-10-30 | nightly 중간 버전 |
 | 0.3.2 | 2025-06-05 | StarLight 0.3.4b |
@@ -21,9 +22,50 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 | 0.2.0 | 2024-02-08 | StarLight v0.2.0a |
 | 0.1.0 | 2022 | |
 
+### 1.2.0
+
+2026-11-14 · **StarLight 1.2.0**.
+
+1.1.x용으로 만든 플러그인은 1.2.0에서 수정 없이 불러와져요. 1.2.0에서 더해진 API는 앱이 쓰는 인터페이스 두 개뿐이고, 없어지거나 바뀐 API는 없어요. 다만 아래 **동작 변경**은 기존 플러그인에도 적용되니 확인하세요. 할 일은 [1.1.x에서 1.2.0으로](/docs/plugins/migration#1.1.x에서-1.2.0으로)에 정리했어요.
+
+| 구분 | 내용 | 플러그인이 할 일 |
+|---|---|---|
+| 동작 변경 | [컴파일 뒤 생명주기 상태가 스위치를 따름](/docs/plugins/reference/projects#프로젝트-생명주기) | 생명주기 관찰자의 `onEnable` 확인 |
+| 동작 변경 | [다시 컴파일하다 실패하면 프로젝트를 내림](/docs/plugins/reference/projects#프로젝트-생명주기) | `DESTROYED`를 삭제로 여기는 코드 확인 |
+| 동작 변경 | [켜다가 실패한 플러그인은 등록한 것까지 모두 뺌](/docs/plugins/reference/plugin#수명-주기) | 확인 |
+| 동작 변경 | [네이티브 라이브러리와 assets를 플러그인 파일이 바뀌면 다시 풂](/docs/plugins/reference/plugin#정보와-파일) | 확인 |
+| 동작 변경 | 플러그인 코드 호출을 하나씩 보호함 | 없음 |
+| 동작 변경 | [`callFunction`이 기다리는 답을 건너뜀](/docs/plugins/reference/projects#메서드) | `callFunction("onMessage", …)`로 메시지를 보내는 플러그인이라면 확인 |
+| 스크립트 | [새 스크립트 전역과 이름 충돌](/docs/plugins/guides/script-api#주의할-점) | 스크립트 API 이름 확인 |
+| 새 API | `ProjectCallGate`, `ProjectErrorListener` (앱 전용) | 없음 |
+
+**동작 변경**
+
+- 컴파일이 끝나면 생명주기 상태가 프로젝트 스위치를 따라요. 켜진 프로젝트는 `ENABLED`가 되니, 생명주기 관찰자는 컴파일할 때마다 `onEnable`을 받아요. 이전에는 컴파일 직후 늘 `DISABLED`였어요.
+- 실행 중인 프로젝트를 다시 컴파일하다 실패하면 이전 버전도 타이머와 리스너까지 모두 내려가고, 상태는 `DESTROYED`가 돼요(관찰자는 `onDestroy`를 받아요). 스위치는 그대로라서 다음 컴파일에 성공하면 다시 실행돼요. 첫 컴파일이 도중에 실패해도 그때까지 걸린 타이머가 정리돼요. `onStartCompile`에서 난 오류는 로그에 남기고 컴파일을 계속해요.
+- 켜는 중에 실패한 플러그인(`onEnable`이 예외를 던짐)은 불러온 플러그인 목록에서 빠지고, 그 플러그인이 등록한 언어, 위젯, API, API 레벨, 이벤트도 모두 빠져요. 리스너는 그때 `onDisable`을 받고, 이 플러그인이 꼭 필요한 다른 플러그인은 불러오지 않아요.
+- 플러그인의 네이티브 라이브러리와 assets는 `assetRevision`이 바뀔 때뿐 아니라 플러그인 파일이 바뀌어도 다시 풀어요. 이전에 풀어 둔 파일만 지우고, 플러그인이 그 폴더에 따로 만든 파일은 남겨요. 1.2.0으로 업데이트한 뒤 처음 시작할 때는 모든 플러그인을 한 번씩 다시 풀어요. ABI 폴더는 이름 전체로 맞춰요(`x86`이 `x86_64`를 가져가지 않아요).
+- 설치된 플러그인 위에 새 파일을 설치하면, 이전 파일을 먼저 지우지 않고 새 파일로 그 자리에서 바꿔요.
+- 점(`.`)으로만 된 플러그인 ID는 거부해요. 플러그인 ID나 이름이 플러그인 폴더 밖을 가리킬 수 없어요.
+- 플러그인 API의 `getInstance`, 위젯 생성과 설정, 언어의 설정 콜백, `release`/`destroy`, 네트워크·링크 콜백을 호출마다 보호해요. 플러그인 API 하나가 실패하면 그 API만 빼고 컴파일해서, 모든 프로젝트의 컴파일이 함께 실패하지 않아요.
+- `Project.callFunction`은 작업자에서 앱의 `ProjectCallGate`를 거쳐요. 스크립트가 `Chat.waitFor()`로 기다리던 답 메시지는 그 프로젝트의 `onMessage`로 가지 않고 조용히 건너뛰어요. 이때 `onException`은 불리지 않아요.
+- 이벤트 함수나 타이머가 프로젝트 설정의 **느린 실행 경고 (초)**(기본 10초)보다 오래 끝나지 않으면 프로젝트 로그에 경고가 남아요. 플러그인이 보낸 이벤트도 같아요.
+
+**새 API**
+
+- `ProjectCallGate`, `ProjectErrorListener`(`project` 패키지, `@since 1.2.0`): 앱이 `Chat.waitFor()`와 스크립트의 `onUncaughtError`를 구현하는 데 쓰는 인터페이스예요. 플러그인이 구현하거나 부르는 API가 아니라서 문서에서는 숨겨 두었어요(`@suppress`).
+
+**그 밖의 변경**
+
+- 앱의 NeonJS가 0.1.8로 올라갔어요. 플러그인이 컴파일에 쓰는 `neonjs-core`는 0.1.7이어도 돼요.
+- 스크립트에 새 전역이 생겼어요. StarLight 오리지널 방식에 `Store`, `Chat`, `Schedule`, `Format`, 메신저봇 방식에 `AppData`, `GlobalLog`, `Http`, `Security`, `Database`(API2)가 들어와요. 같은 이름의 스크립트 API를 등록한 플러그인은 [이름 충돌](/docs/plugins/guides/script-api#주의할-점)을 확인하세요.
+- Rhino 스크립트의 최상위 `const`가 같은 이름의 스크립트 API보다 우선해요.
+
+원본: [StarLight#112](https://github.com/mooner1022/StarLight/pull/112), [StarLight#113](https://github.com/mooner1022/StarLight/pull/113), [StarLight#114](https://github.com/mooner1022/StarLight/pull/114), [StarLight#115](https://github.com/mooner1022/StarLight/pull/115), [StarLight#120](https://github.com/mooner1022/StarLight/pull/120)
+
 ### 1.1.0
 
-예비 사양 · nightly. StarLight 1.1.0과 함께 배포할 예정이에요. 확정 전이라 내용이 바뀔 수 있어요.
+2026-11-10 · **StarLight 1.1.0**.
 
 1.0.x용으로 만든 플러그인은 1.1.0에서 수정 없이 불러와져요. 다만 아래 **동작 변경**은 기존 플러그인에도 적용되니 확인하세요. 할 일은 [1.0.x에서 1.1.0으로](/docs/plugins/migration#1.0.x에서-1.1.0으로)에 체크리스트로 정리했어요.
 
@@ -70,14 +112,11 @@ PluginCore의 버전은 `Info.PLUGINCORE_VERSION`이에요. ConfigDSL은 따로 
 - 스크립트에서 `Plugins.ofId(id).enabled`가 불러온 플러그인에 대해 `true`를 돌려줘요.
 - `StarlightPlugin`의 내부 필드 `originalFile`이 스크립트에 보이지 않아요(`@JvmSynthetic`). 이전에는 스크립트에서 읽고 쓸 수 있었어요.
 
-> [!NOTE]
-> 스냅샷 `1.1.0-261108`(versionCode 1000147)부터 위 변경이 모두 들어 있어요. 플러그인의 KDoc·가이드를 읽는 기능과 개발자 모드의 문서 확인 화면([#106](https://github.com/mooner1022/StarLight/pull/106))은 이 빌드부터예요. 스냅샷 `1.1.0-261107`(versionCode 1000144)에는 그 밖의 변경이 들어 있고, 같은 이름의 앞선 빌드(versionCode 1000142)에는 버전 표와 `@RequiresPluginCore`([#105](https://github.com/mooner1022/StarLight/pull/105))가 없어서, 그 시점의 AAR로는 Gradle 플러그인이 `api_version`을 계산할 수 없어요. 그 전 스냅샷 `1.0.1-261107`(versionCode 1000141)은 #104가 들어 있어도 PluginCore를 `1.0.1`로 보고해서 `api_version`이 `1.1.0`인 플러그인을 불러오지 않아요.
-
 원본: [StarLight#104](https://github.com/mooner1022/StarLight/pull/104), [StarLight#105](https://github.com/mooner1022/StarLight/pull/105), [StarLight#106](https://github.com/mooner1022/StarLight/pull/106), [StarLight-GradlePlugin#4](https://github.com/mooner1022/StarLight-GradlePlugin/pull/4), [StarLight-GradlePlugin#5](https://github.com/mooner1022/StarLight-GradlePlugin/pull/5)
 
 ### 1.0.1
 
-2026-11-06 · **StarLight 1.0.1**. 현재 정식·베타 앱에 들어 있는 버전이에요. Gradle 플러그인 0.4.0이 `api_version`을 계산할 때 기준으로 삼는 가장 오래된 버전이기도 해요.
+2026-11-06 · **StarLight 1.0.1**. Gradle 플러그인 0.4.0이 `api_version`을 계산할 때 기준으로 삼는 가장 오래된 버전이기도 해요.
 
 - 프로젝트가 API 레벨을 골라요. API 레벨은 프로젝트가 한꺼번에 고르는 API와 이벤트 묶음이에요(`Session.apiLevelManager`, `ApiLevel`). 어느 레벨에도 넣지 않은 플러그인의 API와 이벤트는 모든 프로젝트에 들어가요.
 - 이벤트가 스크립트에 전달되는 방식과 시작 코드를 정할 수 있어요: `ProjectEvent.dispatch`, `generateCode(generator)`, `usage`, `description`

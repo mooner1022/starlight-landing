@@ -47,13 +47,13 @@ PluginCore 1.0.x 앱에서는 두 경우 모두 리스너의 `onEnable`이 호�
 
 모든 `onEnable`이 끝나면 `isEnabled()`가 `true`가 돼요.
 
-- `onEnable`이 예외를 던지면 불러오기가 실패하고, `isEnabled()`는 `false`로 남아요.
+- `onEnable`이 예외를 던지면 불러오기가 실패하고, `isEnabled()`는 `false`로 남아요. **PluginCore 1.2.0 이상**에서는 그 자리에서 모든 리스너와 플러그인 자신이 `onDisable`을 받고, 플러그인은 불러온 플러그인 목록에서 빠져요. 그때까지 등록한 언어, 위젯, API, API 레벨, 이벤트도 모두 빠지고, 이 플러그인이 꼭 필요한 다른 플러그인은 불러오지 않아요. 앱의 이벤트에 직접 등록한 리스너처럼 다른 곳에 등록한 것은 빠지지 않으니 `onDisable`에서 정리하세요.
 - 불러온 뒤 `setEnabled(true)`는 이미 켜져 있으므로 아무 일도 하지 않아요.
 - 언로드할 때(플러그인 다시 불러오기, 앱 세션 종료)는 `isEnabled()`를 `false`로 바꾸고, 모든 리스너와 플러그인 자신의 `onDisable`을 호출해요.
 - `onDisable`이 예외를 던지면 오류를 로그에 남기고, 나머지 리스너는 계속 비활성화해요.
 
 > [!WARNING]
-> `onDisable`은 `onEnable`이 실행되지 않은 리스너에도 호출될 수 있어요. 예를 들어 불러오는 중에 앞쪽 리스너의 `onEnable`이 실패해도 플러그인은 플러그인 목록에 남고, 그 뒤 언로드할 때 모든 리스너가 `onDisable`을 받아요. `onDisable`은 초기화되지 않은 상태(`lateinit`, 아직 등록하지 않은 리시버 등)를 견디게 작성하세요.
+> `onDisable`은 `onEnable`이 실행되지 않은 리스너에도 호출될 수 있어요. 예를 들어 불러오는 중에 앞쪽 리스너의 `onEnable`이 실패하면, 뒤쪽 리스너는 `onEnable` 없이 `onDisable`을 받아요(1.1.x 앱에서는 언로드할 때, 1.2.0 이상 앱에서는 실패한 그 자리에서). `onDisable`은 초기화되지 않은 상태(`lateinit`, 아직 등록하지 않은 리시버 등)를 견디게 작성하세요.
 
 PluginCore 1.0.x 앱에서는 이렇게 달라요.
 
@@ -94,6 +94,8 @@ PluginCore 1.0.x 앱에서는 이렇게 달라요.
 | `addWidget(widget: Class<out Widget>)` / `addWidget<T>()` | 예전 방식(`Widget` 상속)의 위젯을 등록해요. |
 | `addLanguage(language: Language)` | 새 스크립트 언어를 등록해요. 아래 [언어 추가](#언어-추가)를 참고하세요. |
 
+**PluginCore 1.2.0 이상.** 앱은 등록된 플러그인 코드를 부를 때마다 예외를 잡아요. 대상은 API의 `getInstance`, 위젯 생성과 설정, 언어의 설정 콜백과 `release`/`destroy`, 네트워크·링크 콜백이에요. 예외는 로그에 남고, 플러그인 API 하나가 실패하면 그 API만 빼고 프로젝트를 컴파일해요. 이전 앱에서는 이런 예외가 모든 프로젝트의 컴파일이나 앱을 멈출 수 있었어요.
+
 ## 정보와 파일
 
 | 멤버 | 설명 |
@@ -103,7 +105,7 @@ PluginCore 1.0.x 앱에서는 이렇게 달라요.
 | `isEnabled(): Boolean` | 플러그인이 켜져 있는지 알려 줘요. PluginCore 1.1.0부터는 모든 `onEnable`이 끝난 뒤 `true`가 돼요(1.0.x에서는 불러온 플러그인도 `false`). |
 | `getExternalDataDirectory(): File` | `/sdcard/StarLight/plugins/<이름>(<id>)/`예요. 사용자가 볼 수 있는 파일, 설정 파일(`config-plugin.json`)이 여기 있어요. |
 | `getInternalDataDirectory(): File` | 앱 내부 저장소의 `plugin_data/<id>/`예요. 사용자에게 보이지 않는 데이터를 둘 때 써요. |
-| `getAsset(path: String): File` | 플러그인 assets에서 풀린 파일이에요. assets를 바꿨다면 `starlight.json`의 `assetRevision`을 올려야 다시 풀려요. |
+| `getAsset(path: String): File` | 플러그인 assets에서 풀린 파일이에요. **PluginCore 1.2.0 이상** 앱은 플러그인 파일이 바뀌면 assets를 다시 풀어요(1.2.0으로 업데이트한 뒤 처음 시작할 때도 한 번). 이전 앱에서는 `starlight.json`의 `assetRevision`을 올려야 다시 풀려요. 다시 풀 때 풀어 둔 파일은 원래대로 돌아가니, 바꾼 내용은 데이터 폴더에 저장하세요. |
 | `getClassLoader(): ClassLoader` | 플러그인을 불러온 클래스 로더예요. 플러그인이 만든 스레드에서 리플렉션이나 `ServiceLoader`를 쓴다면 `Thread.contextClassLoader`로 지정하세요. |
 | `fileName`, `fileSize` | 플러그인 파일 이름과 크기예요. |
 | `getDataFolder()` | 더 이상 쓰지 않아요. `getExternalDataDirectory()`를 쓰세요. |

@@ -29,7 +29,7 @@ StarLight/
 | `projects/` | 프로젝트마다 폴더가 하나씩 있어요. 아래에서 설명해요. |
 | `plugins/` | 플러그인 파일과 플러그인별 데이터 폴더예요. [플러그인 설치와 관리](/docs/app/guides/plugins)를 보세요. |
 | `modules/` | 앱이 만들지 않으니 직접 만들어요. **설정 → 프로젝트, 플러그인 → 전역 모듈 로드**를 켜야 쓰여요. |
-| `agent/` | AI 탭의 대화(`conversations/`)와 첨부·생성 파일(`attachments/`)이에요. 앱을 다시 설치해도 남아요. API 키는 여기 없어요. 다른 기기나 빌드로 옮기려면 **AI 설정 → 대화 내보내기**를 써요. |
+| `agent/` | AI 탭의 대화(`conversations/`)와 첨부·생성 파일(`attachments/`)이에요. GitHub 판에서는 앱을 다시 설치해도 남아요. API 키는 여기 없어요. 다른 기기나 빌드로 옮기려면 **AI 설정 → 대화 내보내기**를 써요. |
 | `logs/` | 앱 로그 파일이에요. 보관 기간은 **설정 → 로그**에서 정해요. |
 | `config-general.json` | 설정 탭의 값과 홈 위젯 배치예요. |
 | `notification_rules_v2.json` | **패키지 규칙 설정**에서 만든 규칙이에요. |
@@ -46,8 +46,14 @@ projects/hello-bot/
 ├─ .env               환경 변수 (직접 만들어요)
 ├─ AGENTS.md          AI 에이전트가 이 프로젝트에 대해 적어 두는 메모 (선택)
 ├─ data/              DataBase API가 쓰는 파일
+│  ├─ store/          Store의 값 (<이름>.json)
+│  └─ schedule/
+│     └─ stored.json  Schedule.at으로 남긴 작업
+├─ Database/          API2 Database의 파일
 └─ debugroom/
-   └─ chats.json      디버그 룸 대화 기록
+   ├─ chats.json      디버그 룸 대화 기록
+   ├─ chats/          긴 메시지, 봇이 보낸 파일의 사본(media/)
+   └─ chats.broken.json  읽지 못한 대화 기록 (있을 때만)
 ```
 
 메인 스크립트 말고도 모듈 파일이나 데이터 파일을 자유롭게 넣을 수 있어요. 에디터의 파일 서랍에서 만들거나, 파일 관리자로 복사해요.
@@ -66,6 +72,7 @@ projects/hello-bot/
 | `isPinned` | 즐겨찾기했는지예요. |
 | `createdMillis` | 만든 시각(밀리초)이에요. |
 | `allowedEventIds` | 받을 이벤트 항목(이벤트 ID, 와일드카드, `!` 제외 항목)이에요. 프로젝트 설정의 **받을 이벤트**가 이 값을 고쳐요. |
+| `apiLevels` | 고른 [API 방식](/docs/app/guides/projects#api-방식)이에요(`starlight`, `msgbot.api2`, `msgbot.legacy`). API 방식이 생기기 전에 만든 프로젝트에는 없고, 그런 프로젝트는 모든 API를 써요. |
 | `packages` | 프로젝트 정보 화면에 보이는 패키지 목록이에요. 메시지를 거르는 데 쓰이지는 않아요. |
 
 > [!WARNING]

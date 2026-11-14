@@ -25,20 +25,20 @@ order: 1
 
 ## API 방식
 
-> [!NOTE]
-> Google Play 판과 베타 채널의 1.0.0-261103에는 API 방식이 없어요. 모든 프로젝트가 아래 세 방식의 API를 함께 쓰고, `response`는 **설정 → 알림, 이벤트**의 **레거시 이벤트 사용**을 켜야 불려요.
-
 프로젝트마다 스크립트에서 쓸 API를 골라요. 고른 방식에 든 객체와 이벤트만 스크립트에 들어가고, 여러 방식에 함께 든 객체(`Log`, `Device`, `FileStream` 등)는 한 번만 들어가요. 플러그인이 더한 객체와 이벤트는 방식과 상관없이 모든 프로젝트에 들어가요.
 
 | 방식 | 객체 | 이벤트 |
 |---|---|---|
-| **StarLight 오리지널** | `Log`, `Projects`, `Plugins`, `Languages`, `Platform`, `Env`, `Java`, `Notification`, `HomeWidget`, `MediaSharer`, `EventEmitter` | `onMessage`, `onMessageDeleted`, `onNotificationPosted`, `onStartCompile` |
-| **메신저봇 API2** | `Log`, `BotManager`, `Event`, `Broadcast`, `App`, `Device`, `FileStream` | `bot.addListener(…)`로 등록하는 리스너 (`starlight.api2.*`) |
-| **메신저봇 레거시** | `Log`, `Api`, `Utils`, `DataBase`, `Bridge`, `Device`, `FileStream` | `response`, `onNotificationPosted`, `onStartCompile` |
+| **StarLight 오리지널** | `Log`, `Store`, `Chat`, `Schedule`, `Format`, `MediaSharer`, `Env`, `Notification`, `HomeWidget`, `Projects`, `Plugins`, `Languages`, `Platform`, `Java`, `EventEmitter` | `onMessage`, `onMessageDeleted`, `onNotificationPosted`, `onStartCompile` |
+| **메신저봇 API2** | `Log`, `BotManager`, `Event`, `App`, `Database`, `Broadcast`, `Device`, `FileStream`, `AppData`, `GlobalLog`, `Http`, `Security` | `bot.addListener(…)`로 등록하는 리스너 (`starlight.api2.*`) |
+| **메신저봇 레거시** | `Log`, `Api`, `Utils`, `DataBase`, `Bridge`, `Broadcast`, `Device`, `FileStream`, `AppData`, `GlobalLog`, `Http`, `Security` | `response`, `onNotificationPosted`, `onNotificationRemoved`, `onStartCompile` |
+
+`onUncaughtError`와 `onProjectButtonClicked`는 방식과 상관없이 모든 프로젝트에서 쓸 수 있어요. 각 객체는 [스크립트 API](/docs/app/reference/script-api)를 보세요.
 
 - 새 프로젝트의 마법사에서 고르고, 나중에 **프로젝트 설정 → API 방식**에서 바꿀 수 있어요. 바꾼 뒤에는 다시 컴파일해야 적용돼요.
 - **StarLight 오리지널**이나 **메신저봇 API2**를 고르면 언어 단계에서 NeonJS가 미리 골라져요.
-- Rhino에서 **StarLight 오리지널**과 **메신저봇 API2**를 함께 고르면, 최상위에 정의한 `onMessage` 함수가 StarLight 이벤트로도 불려 한 메시지에 두 번 호출될 수 있어요. NeonJS는 `export`한 함수만 부르므로 해당되지 않아요.
+- Rhino에서 **StarLight 오리지널**과 **메신저봇 API2**를 함께 고르면, 최상위에 정의한 `onMessage` 함수가 StarLight 이벤트로도 불려 한 메시지에 두 번 호출될 수 있어요. 새 프로젝트의 기본 코드는 그래서 API2 리스너에 `onApi2Message`처럼 다른 이름을 써요. NeonJS는 `export`한 함수만 부르므로 해당되지 않아요.
+- Rhino 스크립트의 최상위 `const`는 같은 이름의 API보다 우선해요. 예를 들어 `const Chat = …`을 쓰면 그 스크립트에서는 `Chat` API를 쓸 수 없어요.
 - API 방식이 생기기 전에 만든 프로젝트는 세 방식을 모두 가진 채로 옮겨져요.
 
 ## 프로젝트 카드
@@ -52,6 +52,7 @@ order: 1
 | **수정** | [코드 에디터](/docs/app/guides/editor)를 열어요. |
 | **컴파일** | 스크립트를 다시 읽어 실행할 준비를 해요. 실패하면 **자세히**로 오류를 볼 수 있어요. |
 | **디버그** | [디버그 룸](/docs/app/guides/debug-room)을 열어요. 컴파일된 뒤에 쓸 수 있어요. |
+| **AI** | 이 프로젝트에 대해 [StarLight AI](/docs/app/guides/ai)와 대화를 시작해요. |
 | **설정** | 프로젝트 설정을 열어요. |
 | **정보** | 이름, 메인 스크립트, 생성일, 언어, 스레드와 작업 상태를 보여 줘요. |
 | **즐겨찾기** | 프로젝트를 목록 맨 위에 고정해요. |
@@ -59,7 +60,7 @@ order: 1
 프로젝트 설정에서 **사용자 지정 버튼**을 추가했다면 그 버튼도 여기에 나와요. 버튼을 누르면 스크립트의 `onProjectButtonClicked(buttonId)` 함수가 불려요.
 
 > [!NOTE]
-> 켜 둔 프로젝트는 앱이 시작될 때 자동으로 컴파일돼요. 이때 컴파일에 실패한 프로젝트는 꺼져요.
+> 켜 둔 프로젝트는 앱이 시작될 때 자동으로 컴파일돼요. 이때 컴파일에 실패한 프로젝트는 꺼져요. 이미 실행 중인 프로젝트를 다시 컴파일하다 실패해도, 이전 버전은 타이머와 리스너까지 모두 내려가고 프로젝트는 멈춘 상태가 돼요. 스위치는 그대로라서 다음 컴파일에 성공하면 다시 실행돼요.
 
 ## 정렬과 검색
 
@@ -72,17 +73,14 @@ order: 1
 
 | 분류 | 항목 |
 |---|---|
-| **일반** | **프로젝트 위치**(폴더 경로), **프로젝트 이름 변경**(메인 스크립트 이름도 함께 바꿀 수 있어요), **오류 발생시 비활성화**(기본 켜짐) |
+| **일반** | **프로젝트 위치**(폴더 경로), **프로젝트 이름 변경**(메인 스크립트 이름도 함께 바꿀 수 있어요), **오류 발생시 비활성화**(기본 켜짐), **느린 실행 경고 (초)**(이벤트나 타이머 등이 이 시간보다 오래 끝나지 않으면 로그에 경고해요. 기본 10초, 0이면 끄기) |
 | **API 방식** | 스크립트에서 쓸 API예요. 위 [API 방식](#api-방식)을 보세요. |
 | **이벤트** | **받을 이벤트** — 이 프로젝트가 받는 이벤트예요. 아래 [받을 이벤트](#받을-이벤트)를 보세요. |
 | **언어** | 언어별 설정이에요. NeonJS는 [언어 설정](/docs/neonjs/reference/settings)을 보세요. Rhino는 **JS-라이노** 카테고리에 있어요. |
-| **실험적 기능** | **사용자 지정 버튼** — 카드에 버튼을 추가해요. 버튼마다 ID와 아이콘을 정해요. |
+| **실험적 기능** | **사용자 지정 버튼** — 카드에 버튼을 추가해요. 버튼마다 ID와 아이콘을 정해요. 개발자 모드의 **동시 실행 수 변경**을 켜면 **동시 실행 수**도 나와요. |
 | **위험** | **프로젝트 정보 다시 로드**, **프로젝트 스레드 강제 종료**, **프로젝트 스코프 폐기**, **프로젝트 제거** |
 
 ### 받을 이벤트
-
-> [!NOTE]
-> Google Play 판과 베타 채널의 1.0.0-261103에서는 이 항목이 **호출이 허용된 이벤트**예요. 받을 이벤트 ID를 목록에 하나씩 더해요. 기본값 `starlight.*`은 StarLight의 기본 이벤트를 모두 받아요.
 
 항목에는 지금 받는 이벤트가 보이고, 누르면 이벤트 목록이 열려요.
 
@@ -99,12 +97,12 @@ order: 1
 - **프로젝트 스코프 폐기**는 컴파일된 상태를 버려요. 다시 컴파일하기 전까지 프로젝트가 동작하지 않아요.
 
 > [!TIP]
-> 봇이 끝나지 않는 반복문에 빠져 응답하지 않으면 프로젝트를 **다시 컴파일**하거나 **프로젝트 스코프 폐기**를 쓰세요. NeonJS 프로젝트는 이때 실행 중인 코드가 중단돼요.
+> 봇이 끝나지 않는 반복문에 빠져 응답하지 않으면 프로젝트를 **다시 컴파일**하거나 **프로젝트 스코프 폐기**를 쓰세요. NeonJS 프로젝트는 이때 실행 중인 코드가 중단돼요. Rhino 코드는 실행 중에 멈출 수 없어서, 다시 컴파일하면 새 작업자로 이어 가지만 그 반복문은 앱을 다시 시작할 때까지 돌아요. 이런 코드는 **느린 실행 경고 (초)** 덕분에 로그에서 찾을 수 있어요.
 
 ## 내보내기와 가져오기
 
 - 카드의 **정보**를 누르고 **파일 → 내보내기**를 누르면 프로젝트를 zip 파일로 저장해요.
-- **새 프로젝트** 창의 **zip 파일에서 가져오기**로 내보낸 프로젝트를 다시 불러와요.
+- **새 프로젝트** 창의 **zip 파일에서 가져오기**로 내보낸 프로젝트를 다시 불러와요. 가져온 프로젝트는 바로 실행되지 않도록 꺼진 상태로 추가돼요.
 
 백업하거나, 다른 기기 또는 다른 판(Google Play 판, GitHub 판)으로 옮길 때 써요.
 
@@ -122,7 +120,10 @@ StarLight/projects/hello-bot/
 ├─ hello-bot.js        메인 스크립트
 ├─ config.json         프로젝트 설정 (언어 설정 포함)
 ├─ logs.json           이 프로젝트의 로그
-├─ data/               스크립트가 저장하는 데이터
+├─ data/               스크립트가 저장하는 데이터 (DataBase)
+│  ├─ store/           Store의 값
+│  └─ schedule/        Schedule.at으로 남긴 작업
+├─ Database/           API2 Database의 파일
 └─ debugroom/          디버그 룸 대화 기록
 ```
 

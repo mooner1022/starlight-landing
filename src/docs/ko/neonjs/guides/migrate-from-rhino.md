@@ -81,6 +81,8 @@ ES 모듈은 언제나 엄격 모드로 실행돼요. Rhino에서 그냥 넘어�
 - Java 메서드가 돌려준 문자열은 항상 JS 문자열이에요. Rhino에서 `String(x)`나 `x + ""`로 바꾸던 코드는 그대로 둬도 괜찮아요.
 - 2⁵³보다 큰 `long` 값(`event.chatLogId` 등)은 BigInt로 들어와요. 문자열로 바꿔 비교하세요.
 - `event.room.isGroupChat`처럼 `is`로 시작하는 값은 `isGroupChat()`으로 불러요. 괄호가 없으면 항상 참이 돼요.
+- API에 `undefined`를 넘기면 Rhino에서는 `"undefined"`라는 글자가 되기도 하지만(예: 메신저봇 `Database`에 저장한 값), NeonJS에서는 `null`이 돼요. 그 글자로 저장하거나 비교하던 코드가 있다면 확인하세요.
+- API가 돌려준 Java 배열과 `List`는 두 언어 모두 `length`와 인덱스로 읽는 배열 비슷한 객체예요. `map()` 같은 배열 메서드를 쓰려면 `Array.from()`으로 바꾸세요. `Chat.getRooms()`, `Schedule.getTasks()`, `Store`의 값은 처음부터 JS 배열과 객체예요.
 
 ## 6. 동시 실행 생각하기
 
@@ -88,14 +90,16 @@ Rhino 프로젝트는 기본으로 이벤트를 **세 개까지 동시에** 실�
 
 - 여러 이벤트가 같은 변수를 동시에 바꾸는 문제는 없어져요.
 - 대신 오래 걸리는 처리는 다른 메시지를 기다리게 해요. 웹 요청은 `Utils.getWebText()` 대신 [`fetch`](/docs/neonjs/guides/async#fetch)와 `await`를 쓰면, 기다리는 동안 다른 이벤트를 처리할 수 있어요.
+- 다음 메시지를 기다릴 때도 마찬가지예요. Rhino에서 콜백으로 받던 [`Chat.waitFor()`](/docs/neonjs/guides/async#다음-메시지-기다리기)는 NeonJS에서 `await`로 기다려요.
 
 ## 7. 그 밖에
 
 | Rhino | NeonJS |
 |---|---|
-| `Log.i("…")`만 가능 | `Log`도 되고, `console.log()`도 돼요. |
-| `setTimeout(fn, ms)` | `setTimeout(fn, ms, ...args)` — 추가 인자를 넘길 수 있어요. |
-| `Bridge.getScopeOf("다른 프로젝트")` | NeonJS 프로젝트는 대상이 될 수 없어요. 프로젝트끼리는 `Broadcast`로 주고받으세요. |
+| `Log.i()`, 메신저봇 형식의 `console.log()` | `Log`도 되고, Node.js 형식의 `console.log()`도 돼요. 출력 형식이 조금 달라요. |
+| 최상위 `const Chat = …`이 같은 이름의 API를 가려요. | 모듈 안에서만 가려요. 다른 파일에서는 API를 그대로 써요. |
+| `onUncaughtError`의 `origin`은 늘 `"uncaughtException"` | 처리하지 않은 Promise는 `"unhandledRejection"`으로 와요. |
+| `Bridge.getScopeOf("다른 프로젝트")` | NeonJS 프로젝트는 대상이 될 수 없어요. 프로젝트끼리는 메신저봇 방식의 `Broadcast`로 주고받으세요. |
 | 프로젝트 설정의 **JS-라이노** 카테고리 | **NeonJS** 카테고리. [언어 설정](/docs/neonjs/reference/settings)을 보세요. |
 
 다 옮겼다면 [디버그 룸](/docs/app/guides/debug-room)에서 충분히 시험한 뒤, 기존 Rhino 프로젝트를 끄고 새 프로젝트를 켜세요.
