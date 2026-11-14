@@ -11,7 +11,7 @@ order: 5
 | 버튼 | 하는 일 |
 |---|---|
 | **표시 방식** | **카드** 또는 **텍스트**로 보여요. |
-| **로그 필터** | 종류(INFO, WARN, ERROR, CRITICAL, DEBUG), 태그(쉼표로 구분), 메시지(정규식)로 걸러요. **필터 초기화**로 되돌려요. |
+| **로그 필터** | 종류(INFO, WARN, ERROR, CRITICAL, DEBUG), 태그(쉼표로 구분), 메시지(정규식)로 걸러요. 태그와 메시지는 대소문자를 가리지 않고 일부만 맞아도 찾아요. 필터가 걸려 있으면 **로그 필터** 칩이 보이고, 걸러진 로그가 없으면 필터를 지우는 버튼이 나와요. **필터 초기화**로 되돌려요. |
 | **자동 스크롤** | 새 로그가 오면 맨 아래로 내려가요. |
 
 ## 프로젝트 로그
@@ -20,15 +20,17 @@ order: 5
 
 ## 스크립트에서 로그 남기기
 
-NeonJS 프로젝트는 `console`, 두 언어 모두 `Log` API로 로그를 남겨요.
+두 언어 모두 `console`과 `Log` API로 로그를 남겨요. NeonJS의 `console`은 Node.js처럼, Rhino의 `console`은 메신저봇처럼 출력해요.
 
 ```javascript
-console.log("메시지 받음:", event.message);   // NeonJS
-Log.i("메시지 받음: " + event.message);         // NeonJS, Rhino
+console.log("메시지 받음:", event.message);
+Log.i("메시지 받음: " + event.message);
 Log.e("API", "응답이 비었어요");                 // 태그와 함께
 ```
 
-`Log`는 `v`/`d`/`i`/`w`/`e`(또는 `verbose`/`debug`/`info`/`warn`/`error`) 메서드로 단계를 정해요. [스크립트 API](/docs/app/reference/script-api#로그-log)를 보세요.
+스크립트의 오류는 첫 줄에 파일, 줄, 열이 붙어 한 번만 남고, 그 아래에 스크립트의 스택이 이어져요. 코드가 오래 끝나지 않으면 [느린 실행 경고](/docs/app/guides/projects#프로젝트-설정)도 여기에 남아요. `Log.d()`와 `console.debug()`는 프로젝트 로그에는 남지 않고 로그 탭에만 남으니, 다시 읽어야 할 내용은 `console.log()`나 `Log.i()`로 남기세요.
+
+`Log`는 `v`/`d`/`i`/`w`/`e`(또는 `verbose`/`debug`/`info`/`warn`/`error`) 메서드로 단계를 정해요. [스크립트 API](/docs/app/reference/script-api#로그-log-globallog)를 보세요.
 
 ## 로그 파일
 

@@ -15,7 +15,7 @@ order: 3
 
 ## 메시지 보내기
 
-아래 입력창에 메시지를 쓰고 보내면, 이 프로젝트의 `onMessage` 함수가 불려요. 프로젝트의 API 방식에 **메신저봇 레거시**가 있으면 `response` 함수도 함께 불려요.
+아래 입력창에 메시지를 쓰고 보내면, 이 프로젝트의 `onMessage` 함수가 불려요. 프로젝트의 API 방식에 **메신저봇 레거시**가 있으면 `response` 함수도, **메신저봇 API2**가 있으면 `Event.MESSAGE`와 `Event.COMMAND` 리스너도 함께 불려요.
 
 - 봇의 답장은 봇 이름(기본 `BOT`)의 말풍선으로 보여요. 500자가 넘는 답장은 긴 말풍선으로 보여요.
 - 봇이 [`MediaSharer.send()`나 `event.room.sendMedia()`](/docs/app/reference/script-api#파일-보내기-mediasharer-room.sendmedia)로 보낸 파일도 채팅에 보여요. 이미지는 사진으로, 다른 파일은 이름과 크기로 보이고, 누르면 이미지·Markdown·텍스트는 앱 안에서 미리 보고 다른 파일은 다른 앱으로 열어요.
@@ -23,7 +23,7 @@ order: 3
 - 스크립트가 읽음 처리를 부르면 **읽음 처리 호출됨** 안내가 떠요.
 - 스크립트에서 오류가 나면 프로젝트 이름과 함께 **자세히 보기** 버튼이 나와요.
 
-대화 기록은 프로젝트마다 `debugroom/chats.json`에 저장돼요. 봇이 보낸 파일의 사본은 `debugroom/chats/media/`에 두고, 대화 기록을 지우면 함께 지워요.
+대화 기록은 프로젝트마다 `debugroom/chats.json`에 저장돼요. 봇이 보낸 파일의 사본은 `debugroom/chats/media/`에 두고, 대화 기록을 지우면 함께 지워요. 저장된 대화 기록을 읽을 수 없으면 `debugroom/chats.broken.json`으로 옮겨 두고 빈 대화로 열어요.
 
 ## 디버그 룸 설정
 
@@ -46,4 +46,9 @@ order: 3
 | `event.sender.id` | `null` |
 | `event.chatLogId` | `-1` |
 | `event.image` | `null` |
-| `replier.reply(방, 메시지)` | 방 이름을 무시하고 디버그 룸에 보내요. |
+| `event.room.name` | 설정의 **방 이름**이에요. 정하기 전에는 `"undefined"`예요. |
+| `event.hasMention` | `<@이름>`을 쓴 메시지면 `true`예요. |
+| `response`의 `logId`, `channelId`, `userHash` | `0`, `0`, `"DEBUG ROOM"` |
+| API2 `msg.channelId`, `msg.logId`, `msg.author.hash` | `0`, `0`, `"DEBUG ROOM"` |
+| `replier.reply(방, 메시지)`, `Api.replyRoom()` | 디버그 룸의 이름이나 ID를 주면 디버그 룸에 보이고, 다른 방은 실제로 아는 방에서 찾아요. 모르는 방이면 `false`예요. |
+| 마크다운·스포일러로 보낸 텍스트 | 서식 없이 보여요. |
